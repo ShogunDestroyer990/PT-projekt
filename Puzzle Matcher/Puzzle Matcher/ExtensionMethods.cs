@@ -1,12 +1,30 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using Emgu.CV;
+using Emgu.CV.Structure;
 
 namespace Puzzle_Matcher
 {
 	public static class ExtensionMethods
 	{
 		public static string ImagePath { get; set; }
+
+		public static object ImageOut { get; set; }
+
+		public static void MyFirstMethod()
+		{
+			Image<Bgr, Byte> My_Image = new Image<Bgr, Byte>(ImagePath);
+			Image<Gray, Byte> ibw = My_Image.Convert<Gray, Byte>();
+
+			Image<Gray, Byte> ibw1 = ibw.Canny(100, 200);
+
+			ibw1._Dilate(1);
+			ibw1._Erode(1);
+
+			ImageOut = ibw1.ToBitmap();
+		}
 
 		/// <summary>
 		/// Resize the image to the specified width and height.

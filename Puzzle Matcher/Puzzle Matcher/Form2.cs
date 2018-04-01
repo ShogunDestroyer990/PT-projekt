@@ -15,6 +15,7 @@ namespace Puzzle_Matcher
 		public ResultWindow()
 		{
 			InitializeComponent();
+			ImageOut.Image = ExtensionMethods.ResizeImage(((Bitmap) ExtensionMethods.ImageOut), ImageOut.Width, ImageOut.Height);
 		}
 
 		private void ImageOut_Click(object sender, EventArgs e)

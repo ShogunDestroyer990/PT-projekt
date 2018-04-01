@@ -22,7 +22,10 @@ namespace Puzzle_Matcher
 
 		private void Worker_DoWork(object sender, DoWorkEventArgs e)
 		{
-			if(!( sender is BackgroundWorker worker )) return;
+
+			var worker = (BackgroundWorker) sender;
+			if(worker == null) return;
+
 
 			worker.ReportProgress(0);
 
@@ -30,9 +33,11 @@ namespace Puzzle_Matcher
 			//ExtensionMethods.Method();
 			//worker.ReportProgress(Progress);
 
+			ExtensionMethods.MyFirstMethod();
 
-			//DEBUG ONLY
-			Thread.Sleep(5000);
+			worker.ReportProgress(50);
+
+			Thread.Sleep(2000);
 
 
 			worker.ReportProgress(100);
