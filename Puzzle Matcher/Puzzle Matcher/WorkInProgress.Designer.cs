@@ -1,11 +1,14 @@
-﻿namespace Puzzle_Matcher
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace Puzzle_Matcher
 {
 	partial class WorkInProgress
 	{
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+		private IContainer components = null;
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -30,6 +33,7 @@
 		{
 			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.Worker = new System.ComponentModel.BackgroundWorker();
+			this.Description = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// progressBar
@@ -47,11 +51,21 @@
 			this.Worker.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.Worker_ProgressChanged);
 			this.Worker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.Worker_RunWorkerCompleted);
 			// 
+			// Description
+			// 
+			this.Description.BackColor = System.Drawing.Color.Transparent;
+			this.Description.Location = new System.Drawing.Point(12, 45);
+			this.Description.Name = "Description";
+			this.Description.Size = new System.Drawing.Size(800, 13);
+			this.Description.TabIndex = 1;
+			this.Description.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			// 
 			// WorkInProgress
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(824, 54);
+			this.ClientSize = new System.Drawing.Size(824, 67);
+			this.Controls.Add(this.Description);
 			this.Controls.Add(this.progressBar);
 			this.Name = "WorkInProgress";
 			this.Text = "Your image is processing.";
@@ -61,7 +75,8 @@
 
 		#endregion
 
-		private System.Windows.Forms.ProgressBar progressBar;
-		private System.ComponentModel.BackgroundWorker Worker;
+		private ProgressBar progressBar;
+		private BackgroundWorker Worker;
+		private Label Description;
 	}
 }

@@ -1,11 +1,14 @@
-﻿namespace Puzzle_Matcher
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace Puzzle_Matcher
 {
 	partial class MainWindow
 	{
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+		private IContainer components = null;
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -87,9 +90,9 @@
 
 		#endregion
 
-		private System.Windows.Forms.PictureBox ImageIn;
-		private System.Windows.Forms.PictureBox ProcessImage;
-		private System.Windows.Forms.OpenFileDialog ofd;
+		private PictureBox ImageIn;
+		private PictureBox ProcessImage;
+		private OpenFileDialog ofd;
 	}
 }
 

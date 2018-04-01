@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Puzzle_Matcher
@@ -20,27 +14,27 @@ namespace Puzzle_Matcher
 			Worker.RunWorkerAsync();
 		}
 
+		private void Progress(int progresPercent, string description = "")
+		{
+			Worker.ReportProgress(progresPercent);
+			Description.Text = description;
+		}
+
 		private void Worker_DoWork(object sender, DoWorkEventArgs e)
 		{
-
-			var worker = (BackgroundWorker) sender;
-			if(worker == null) return;
-
-
-			worker.ReportProgress(0);
+			Invoke(new Action(delegate { Progress(0); }));
 
 			//TODO: Calls stack with pattern
 			//ExtensionMethods.Method();
-			//worker.ReportProgress(Progress);
+			//Invoke(new Action(delegate { Progress(int, string); }));
 
-			ExtensionMethods.MyFirstMethod();
+			Invoke(new Action(delegate { Progress(50, "Finding edges of puzzles..."); }));
 
-			worker.ReportProgress(50);
+			ExtensionMethods.FindEdges();
 
-			Thread.Sleep(2000);
+			Thread.Sleep(1000);
 
-
-			worker.ReportProgress(100);
+			Invoke(new Action(delegate { Progress(100, "DONE"); }));
 		}
 
 		private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -50,10 +44,7 @@ namespace Puzzle_Matcher
 
 		private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 		{
-			new Thread(() =>
-			{
-				Application.Run(new ResultWindow());
-			}).Start();
+			new Thread(() => { Application.Run(new ResultWindow()); }).Start();
 
 			Close();
 		}

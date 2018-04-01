@@ -1,11 +1,14 @@
-﻿namespace Puzzle_Matcher
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace Puzzle_Matcher
 {
 	partial class ResultWindow
 	{
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		private System.ComponentModel.IContainer components = null;
+		private IContainer components = null;
 
 		/// <summary>
 		/// Clean up any resources being used.
@@ -60,6 +63,6 @@
 
 		#endregion
 
-		private System.Windows.Forms.PictureBox ImageOut;
+		private PictureBox ImageOut;
 	}
 }
