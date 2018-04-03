@@ -52,6 +52,7 @@ namespace Puzzle_Matcher
 			// 
 			// ProcessImage
 			// 
+			this.ProcessImage.Enabled = false;
 			this.ProcessImage.Image = global::Puzzle_Matcher.Properties.Resources.ButtonProcessImage;
 			this.ProcessImage.InitialImage = null;
 			this.ProcessImage.Location = new System.Drawing.Point(12, 450);
@@ -63,10 +64,10 @@ namespace Puzzle_Matcher
 			// 
 			// ofd
 			// 
-			this.ofd.DefaultExt = "%HOMEPATH%";
-			this.ofd.FileName = "WybierzZdjecie";
-			this.ofd.Filter = "PNG Image (.png)|*.png|GIF Image (.gif)|*.gif|JPG Image (.jpg) |*.jpg|BITMAP Imag" +
+			this.ofd.DefaultExt = "jpg";
+			this.ofd.Filter = "JPG Image (.jpg) |*.jpg|PNG Image (.png)|*.png|GIF Image (.gif)|*.gif|BITMAP Imag" +
     "e (.bmp)|*.bmp|All files (.*)|*.*";
+			this.ofd.InitialDirectory = "%HOMEPATH%";
 			this.ofd.Title = "Wybierz zdjęcie";
 			// 
 			// MainWindow
@@ -79,7 +80,6 @@ namespace Puzzle_Matcher
 			this.HelpButton = true;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "MainWindow";
-			this.ShowInTaskbar = false;
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Okno główne";
 			((System.ComponentModel.ISupportInitialize)(this.ImageIn)).EndInit();

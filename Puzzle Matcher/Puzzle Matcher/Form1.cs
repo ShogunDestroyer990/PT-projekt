@@ -29,6 +29,8 @@ namespace Puzzle_Matcher
 			ExtensionMethods.ImagePath = ofd.FileName;
 
 			ImageIn.Image = ExtensionMethods.ResizeImage(new Bitmap(ofd.FileName), ImageIn.Width, ImageIn.Height);
+
+			if(ExtensionMethods.ImagePath != null) ProcessImage.Enabled = true;
 		}
 
 		/// <summary>
@@ -39,6 +41,7 @@ namespace Puzzle_Matcher
 		/// <returns>Closing current window.</returns>
 		private void ProcessImage_Click(object sender, EventArgs e)
 		{
+			if(ExtensionMethods.ImagePath == null) return;
 			new Thread(() => { Application.Run(new WorkInProgress()); }).Start();
 
 			Close();

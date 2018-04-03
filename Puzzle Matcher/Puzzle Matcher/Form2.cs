@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -8,15 +9,15 @@ namespace Puzzle_Matcher
 	{
 		public ResultWindow()
 		{
-			if(ExtensionMethods.ImageOut != null)
+			if(ExtensionMethods.ImageOut != null && ExtensionMethods.ImageOut.Count > 0)
 			{
-				Images = (object[]) ExtensionMethods.ImageOut;
+				Images = ExtensionMethods.ImageOut;
 
 				Selected = 0;
 
 				InitializeComponent();
 
-				ImageOut.Image = ExtensionMethods.ResizeImage((Bitmap) Images[Selected], ImageOut.Width, ImageOut.Height);
+				ImageOut.Image = ExtensionMethods.ResizeImage(Images[Selected], ImageOut.Width, ImageOut.Height);
 			}
 			else
 			{
@@ -25,15 +26,15 @@ namespace Puzzle_Matcher
 			}
 		}
 
-		private object[] Images { get; }
+		private List<Bitmap> Images { get; }
 		private int Selected { get; set; }
 
 		private void ImageOut_Click(object sender, EventArgs e)
 		{
-			if(Selected < Images.Length - 1) Selected += 1;
+			if(Selected < Images.Count - 1) Selected += 1;
 			else Selected = 0;
 
-			ImageOut.Image = ExtensionMethods.ResizeImage((Bitmap) Images[Selected], ImageOut.Width, ImageOut.Height);
+			ImageOut.Image = ExtensionMethods.ResizeImage(Images[Selected], ImageOut.Width, ImageOut.Height);
 		}
 	}
 }

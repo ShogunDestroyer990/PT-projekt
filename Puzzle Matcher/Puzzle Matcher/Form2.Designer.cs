@@ -54,7 +54,6 @@ namespace Puzzle_Matcher
 			this.HelpButton = true;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "ResultWindow";
-			this.ShowInTaskbar = false;
 			this.Text = "Result Window";
 			((System.ComponentModel.ISupportInitialize)(this.ImageOut)).EndInit();
 			this.ResumeLayout(false);

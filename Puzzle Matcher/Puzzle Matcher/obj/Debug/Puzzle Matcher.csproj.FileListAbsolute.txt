@@ -33,9 +33,9 @@ C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\zh-tw\ZedG
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle_Matcher.MainWindow.resources
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle_Matcher.ResultWindow.resources
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle_Matcher.Properties.Resources.resources
+C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle_Matcher.WorkInProgress.resources
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csproj.GenerateResource.Cache
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csproj.CoreCompileInputs.cache
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.exe
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.pdb
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csprojResolveAssemblyReference.cache
-C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle_Matcher.WorkInProgress.resources

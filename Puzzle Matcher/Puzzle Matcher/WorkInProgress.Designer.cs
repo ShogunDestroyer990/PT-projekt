@@ -31,6 +31,7 @@ namespace Puzzle_Matcher
 		/// </summary>
 		private void InitializeComponent()
 		{
+			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WorkInProgress));
 			this.progressBar = new System.Windows.Forms.ProgressBar();
 			this.Worker = new System.ComponentModel.BackgroundWorker();
 			this.Description = new System.Windows.Forms.Label();
@@ -58,6 +59,7 @@ namespace Puzzle_Matcher
 			this.Description.Name = "Description";
 			this.Description.Size = new System.Drawing.Size(800, 13);
 			this.Description.TabIndex = 1;
+			this.Description.Text = " ";
 			this.Description.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
 			// 
 			// WorkInProgress
@@ -67,6 +69,7 @@ namespace Puzzle_Matcher
 			this.ClientSize = new System.Drawing.Size(824, 67);
 			this.Controls.Add(this.Description);
 			this.Controls.Add(this.progressBar);
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "WorkInProgress";
 			this.Text = "Your image is processing.";
 			this.ResumeLayout(false);
