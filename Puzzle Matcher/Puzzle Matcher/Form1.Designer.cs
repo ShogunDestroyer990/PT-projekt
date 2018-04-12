@@ -67,7 +67,6 @@ namespace Puzzle_Matcher
 			this.ofd.DefaultExt = "jpg";
 			this.ofd.Filter = "JPG Image (.jpg) |*.jpg|PNG Image (.png)|*.png|GIF Image (.gif)|*.gif|BITMAP Imag" +
     "e (.bmp)|*.bmp|All files (.*)|*.*";
-			this.ofd.InitialDirectory = "%HOMEPATH%";
 			this.ofd.Title = "Wybierz zdjęcie";
 			// 
 			// MainWindow
