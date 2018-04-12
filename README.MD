@@ -23,7 +23,8 @@ Aplication that allows you to match puzzles from images.
 Whole documentation under [this file](https://github.com/ShogunDestroyer990/PT-projekt/blob/master/documentation.pdf)
 
 ## Attributions
-//To whom we want thanks for.
+* Mateusz Grabuszyński [GitHub](https://github.com/MateuszGrabuszynski)
+For provided many input images.
 
 ### Special thanks to:
 * P1
