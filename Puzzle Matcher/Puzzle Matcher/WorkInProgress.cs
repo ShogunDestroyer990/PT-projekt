@@ -112,50 +112,42 @@ namespace Puzzle_Matcher
                     {
                         Max.Clear();
                         Max.Push(contours[i]);
+                      
                     }
                 }
 
-                List<Point> points = new List<Point>();
-                for (int i = 0; i < Max.Size; i++)
+                Image<Bgr, Byte> puzzelcopy = puzzel.Clone();
+
+                CvInvoke.FillPoly(puzzelcopy, Max, new MCvScalar(0, 0, 255)); //zamalowuje puzzle\
+              
+                   Bgr white = new Bgr(0, 0, 255);
+                Bgr transparent = new Bgr(Color.Transparent);
+                
+                Bitmap copy = new Bitmap(puzzelcopy.Bitmap);
+
+                for (int j = 1; j < puzzelcopy.Cols; j++)
                 {
-                    points.AddRange(Max[i].ToArray());
-                }
-
-
-                RotatedRect minAreaRect = CvInvoke.MinAreaRect(points.Select(pt => new PointF(pt.X, pt.Y)).ToArray());
-                Point[] vertices = minAreaRect.GetVertices().Select(pt => new Point((int)pt.X, (int)pt.Y)).ToArray();
-                // CvInvoke.PutText(puzzel, vertices[3].ToString(), new Point(40,40), FontFace.HersheySimplex, 2, new MCvScalar(255, 0, 255), 2);
-
-                Bgr color = new Bgr(Color.Transparent);
-
-                puzzel.Draw(vertices, color, 50);
-                //usuwa ale działa tylko na prostokątne puzzle jako że jest to rysowanie przezroczystego prostokąta wokół największego pola
-                /*
-                for (int j = 0; j < puzzel.Cols; j++)
-                {
-                    for (int i = 0; i < puzzel.Rows; i++)
+                    for (int i = 1; i < puzzelcopy.Rows; i++)
                     {
-                        if (!minAreaRect.MinAreaRect().Contains(j,i))
+                        if(!puzzelcopy[i,j].Equals(white))
+                       // if (!copy.GetPixel(i,j).Equals(Color.White))
                         {
-                            puzzel[i, j] = color;
+                            puzzel[i, j] = transparent;
                         }
+
+                       
                     }
-                } //próbowałem zrobić to samo z polem ale nie dało rady
-                */
+                }
 
 
-
-
-                //CvInvoke.DrawContours(puzzel, Max, -1, new MCvScalar(255, 0, 0), 4);
-
-                ExtensionMethods.ImageOut.Add(puzzel.ToBitmap());
+               // ExtensionMethods.ImageOut.Add(puzzel.ToBitmap()); dodanie do wyśietlanych
             }
             //	ExtensionMethods.ImageOut.Add(q5.ToBitmap());
 
             //rozpoznawanie -> keypoints 
             //tak nawaliłem trochę kodu
 
-            /*     var k1 = q1.Copy(); //dla wybranego obrazka
+            /* */var k1 = q1.Copy(); //dla wybranego obrazka
                  SURF surf = new SURF(600); //surf 
                  var keypoints = new VectorOfKeyPoint(); //keyponty
                  UMat kdesc = new UMat();
@@ -166,7 +158,7 @@ namespace Puzzle_Matcher
                  //więc
                  // var orginal = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
                  //żartuje , nie chce mi się dodawać na razie metody dodawania drugiego obrazka więc
-                 var orginal = new Image<Bgr, byte>("path"); //tu powinna być ścieżka
+                 var orginal = new Image<Bgr, byte>("D:/Godziński/Documents/Documents/Visual Studio 2015/Projects/PT-projekt-dkor/Puzzle Matcher/Puzzle Matcher/Resources/Orginal.jpg"); //tu powinna być ścieżka
 
                  var copyOrginal = orginal.Copy();
                  var orginalKeypoints = new VectorOfKeyPoint(); //keyponty
@@ -216,7 +208,7 @@ namespace Puzzle_Matcher
 
                  ExtensionMethods.ImageOut.Add(res.ToBitmap());
                  ExtensionMethods.ImageOut.Add(k1.ToBitmap());
-                 ExtensionMethods.ImageOut.Add(copyOrginal.ToBitmap());*/
+                 ExtensionMethods.ImageOut.Add(copyOrginal.ToBitmap());
             ExtensionMethods.ImageOut.Add(q1.ToBitmap());
 
 
