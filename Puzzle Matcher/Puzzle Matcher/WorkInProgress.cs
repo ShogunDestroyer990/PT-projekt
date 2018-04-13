@@ -158,7 +158,7 @@ namespace Puzzle_Matcher
                  //więc
                  // var orginal = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
                  //żartuje , nie chce mi się dodawać na razie metody dodawania drugiego obrazka więc
-                 var orginal = new Image<Bgr, byte>("D:/Godziński/Documents/Documents/Visual Studio 2015/Projects/PT-projekt-dkor/Puzzle Matcher/Puzzle Matcher/Resources/Orginal.jpg"); //tu powinna być ścieżka
+                 var orginal = new Image<Bgr, byte>("path"); //tu powinna być ścieżka
 
                  var copyOrginal = orginal.Copy();
                  var orginalKeypoints = new VectorOfKeyPoint(); //keyponty
@@ -166,8 +166,6 @@ namespace Puzzle_Matcher
                  surf.DetectAndCompute(copyOrginal, null, orginalKeypoints, odesc, false);
 
                  Features2DToolbox.DrawKeypoints(orginal, orginalKeypoints, copyOrginal, new Bgr(0, 255, 0));
-
-
 
                  //dopasowywanie
                  BFMatcher matcher = new BFMatcher(DistanceType.L2);
