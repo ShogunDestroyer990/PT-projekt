@@ -89,9 +89,13 @@ namespace Puzzle_Matcher
 
             Invoke(new Action(delegate { Progress(80, "Zapisywanie"); }));
 
+           
+            int puzzelCounter = 0; //trochę na kolanie, pewnie da się lepiej zrobić
 
             foreach (Image<Bgr, byte> puzzel in puzzels)
             {
+                puzzelCounter++;
+
                 Image<Gray, Byte> gray = puzzel.Convert<Gray, Byte>();
                 Mat hierarchy = new Mat();
                 VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
@@ -132,7 +136,7 @@ namespace Puzzle_Matcher
                         if(!puzzelcopy[i,j].Equals(white))
                        // if (!copy.GetPixel(i,j).Equals(Color.White))
                         {
-                            puzzel[i, j] = transparent;
+                           // puzzel[i, j] = transparent;
                         }
 
                        
@@ -140,15 +144,20 @@ namespace Puzzle_Matcher
                 }
 
 
-                ExtensionMethods.ImageOut.Add(puzzel.ToBitmap());
+               // ExtensionMethods.ImageOut.Add(puzzel.ToBitmap()); dodanie do wyśietlanych
             }
+
+            double[] avgPuzellXPoints = new double[puzzelCounter];
+            double[] avgPuzellYPoints = new double[puzzelCounter];
+            puzzelCounter = 0;
             //	ExtensionMethods.ImageOut.Add(q5.ToBitmap());
 
             //rozpoznawanie -> keypoints 
             //tak nawaliłem trochę kodu
 
-            /*     var k1 = q1.Copy(); //dla wybranego obrazka
-                 SURF surf = new SURF(600); //surf 
+            /* */
+            var k1 = q1.Copy(); //dla wybranego obrazka
+                 SURF surf = new SURF(920); //surf 
                  var keypoints = new VectorOfKeyPoint(); //keyponty
                  UMat kdesc = new UMat();
                  surf.DetectAndCompute(q1, null, keypoints, kdesc, false);
@@ -166,8 +175,6 @@ namespace Puzzle_Matcher
                  surf.DetectAndCompute(copyOrginal, null, orginalKeypoints, odesc, false);
 
                  Features2DToolbox.DrawKeypoints(orginal, orginalKeypoints, copyOrginal, new Bgr(0, 255, 0));
-
-
 
                  //dopasowywanie
                  BFMatcher matcher = new BFMatcher(DistanceType.L2);
@@ -187,28 +194,91 @@ namespace Puzzle_Matcher
 
 
 
-
-                 foreach (Image<Bgr, byte> puzzel in puzzels)
-                 {
-                     var puzzelpoints = new VectorOfKeyPoint(); //keyponty
-                     UMat pdesc = new UMat();
-                     surf.DetectAndCompute(puzzel, null, puzzelpoints, pdesc, false);
-
-                     VectorOfVectorOfDMatch puzzelmatches = new VectorOfVectorOfDMatch();
-                     matcher.KnnMatch(pdesc, puzzelmatches, 3, null);
-                     Mat Result = new Mat();
-                     Features2DToolbox.DrawMatches(copyOrginal, orginalKeypoints, puzzel, puzzelpoints, puzzelmatches, Result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
-                     Image<Bgr, Byte> MachedPuzzel = new Image<Bgr, Byte>(Result.Bitmap);
-
-                      ExtensionMethods.ImageOut.Add(MachedPuzzel.ToBitmap());
-                     //  Bgr color = puzzel[0, 0]; //czytanie koloru (przydatne do układania kolorami)
-                     //System.Console.Out.Write(color.ToString());
-                 }
+            foreach (Image<Bgr, byte> puzzel in puzzels)
+            {
+                var puzzelpoints = new VectorOfKeyPoint(); //keyponty
+                UMat pdesc = new UMat();
+                surf.DetectAndCompute(puzzel, null, puzzelpoints, pdesc, false);
 
 
-                 ExtensionMethods.ImageOut.Add(res.ToBitmap());
+                VectorOfVectorOfDMatch puzzelmatches = new VectorOfVectorOfDMatch();
+                matcher.KnnMatch(pdesc, puzzelmatches, 3, null);
+
+                VectorOfVectorOfDMatch filteredpuzzelmatches = new VectorOfVectorOfDMatch();
+                VectorOfDMatch filteredmatch = new VectorOfDMatch();
+
+                double X = 0;
+                double Y = 0;
+                int counter = 0;
+                int count = 0;
+
+
+
+                for (int i = 0; i < puzzelmatches.Size; i++)
+                {
+                    var arrayOfMatches = puzzelmatches[i].ToArray();
+                    MDMatch[] filterArray = new MDMatch[arrayOfMatches.Length];
+
+
+                    foreach (var match in arrayOfMatches)
+                    {
+
+                        if (match.Distance > 0.4)//filtr na dokładność
+                        {
+                            X += orginalKeypoints[match.TrainIdx].Point.X;
+                            Y += orginalKeypoints[match.TrainIdx].Point.Y;
+                            filterArray[counter] = match;
+                            counter++;
+                            count++;
+                        }
+                        //var matchingModelKeyPoint = orginalKeypoints[match.TrainIdx];
+                        //Console.WriteLine("Model coordinate '" + matchingModelKeyPoint.Point);
+                    }
+                    filteredmatch.Push(filterArray);
+                    counter = 0;
+                }
+                filteredpuzzelmatches.Push(filteredmatch);
+
+
+                X = X / count;
+                Y = Y / count;
+
+                avgPuzellXPoints[puzzelCounter] = X;
+                avgPuzellYPoints[puzzelCounter] = Y;
+                puzzelCounter++;
+            
+
+                Mat Result = new Mat();
+
+                Features2DToolbox.DrawMatches(copyOrginal, orginalKeypoints, puzzel, puzzelpoints, filteredpuzzelmatches, Result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
+
+                Image<Bgr, Byte> MachedPuzzel = new Image<Bgr, Byte>(Result.Bitmap);
+
+              
+                //        CvInvoke.PutText(MachedPuzzel, avarge.ToString(),new Point(400,400), FontFace.HersheySimplex , 8 , new MCvScalar(255, 0, 255), 10);
+
+
+
+               //  ExtensionMethods.ImageOut.Add(MachedPuzzel.ToBitmap());
+                //  Bgr color = puzzel[0, 0]; //czytanie koloru (przydatne do układania kolorami)
+            
+            }
+
+            var resultTab = ExtensionMethods.placePuzzels(2, 3, avgPuzellXPoints, avgPuzellYPoints); //napisałem algorytm do dopisywania puzzli , wymaga średniego punktów z każdego puzzla oraz podania przez użytkownika jak puzzle się rozkładają tzn, czy mając 6 puzzli to obraz 2x3 puzzle
+
+            string finalword = "Correct way of puting puzzels is: ";
+            for(int i=0;i< puzzelCounter; i++)
+            {
+                resultTab[i]++; //przetwarzając przetwarzałem od zera a puzzle są od 1 ..więc
+                finalword += resultTab[i];
+                finalword += " ";
+            }
+
+            CvInvoke.PutText(k1, finalword, new Point(250, 400), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
+
+            ExtensionMethods.ImageOut.Add(res.ToBitmap());
                  ExtensionMethods.ImageOut.Add(k1.ToBitmap());
-                 ExtensionMethods.ImageOut.Add(copyOrginal.ToBitmap());*/
+                 ExtensionMethods.ImageOut.Add(copyOrginal.ToBitmap());
             ExtensionMethods.ImageOut.Add(q1.ToBitmap());
 
 
