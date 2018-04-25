@@ -1,17 +1,15 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Features2D;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Emgu.CV.XFeatures2D;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using Emgu.CV.XFeatures2D;
-using Emgu.CV.Features2D;
-using Emgu.CV.Flann;
-using System.Linq;
 
 namespace Puzzle_Matcher
 {
@@ -26,194 +24,159 @@ namespace Puzzle_Matcher
 
 		private void Progress(int progresPercent, string description = null)
 		{
-			if(description != null) Description.Text = description;
+			if (description != null) Description.Text = description;
 			Worker.ReportProgress(progresPercent);
 		}
 
-        private void Worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            //TODO: Calls stack with pattern
-            //ExtensionMethods.Method();
-            //Invoke(new Action(delegate { Progress(int, string); }));
+		private void Worker_DoWork(object sender, DoWorkEventArgs e)
+		{
+			var watch = System.Diagnostics.Stopwatch.StartNew();
 
-            Invoke(new Action(delegate { Progress(0, "Wczytywanie obrazka..."); }));
-            var q1 = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
+			Invoke(new Action(delegate { Progress(0, "Wczytywanie obrazka..."); }));
+			var q1 = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
 
+			Invoke(new Action(delegate { Progress(10, "Przygotowywanie obrazka do obróbki..."); }));
 
-            Invoke(new Action(delegate { Progress(10, "Przygotowywanie obrazka do obróbki..."); }));
-            var q2 = q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate(8).Erode(); //dyalatacja sprawuje się o wiele lepiej w znajdywaniu puzzli gdy jest większa
+			//dyalatacja sprawuje się o wiele lepiej w znajdywaniu puzzli gdy jest większa
+			var q2 = q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate(8).Erode();
 
+			Invoke(new Action(delegate { Progress(20, "Znajdowanie wszystkich konturów..."); }));
+			var w3 = ExtensionMethods.FindContours(q2.Copy());
 
-            Invoke(new Action(delegate { Progress(20, "Znajdowanie wszystkich konturów..."); }));
-            var w3 = ExtensionMethods.FindContours(q2.Copy());
+			Invoke(new Action(delegate { Progress(30, "Wybieranie puzzli..."); }));
+			var avg = ExtensionMethods.CalculateAvreage(w3.Item1);
+			var e4 = new VectorOfVectorOfPoint();
+			for (var i = 0; i < w3.Item1.Size; i++)
+			{
+				if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
+			}
 
+			Invoke(new Action(delegate { Progress(40, "Zaznaczanie puzzli..."); }));
+			var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
 
-            Invoke(new Action(delegate { Progress(30, "Wybieranie puzzli..."); }));
-            var avg = ExtensionMethods.CalculateAvreage(w3.Item1);
-            var e4 = new VectorOfVectorOfPoint();
-            for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
+			Invoke(new Action(delegate { Progress(50, "Robienie innych rzeczy..."); }));
+			var boundRect = new List<Rectangle>();
 
+			for (var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
+			var x = 0;
 
-            Invoke(new Action(delegate { Progress(40, "Zaznaczanie puzzli..."); }));
-            var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
+			var puzzels = new List<Image<Bgr, byte>>();
 
+			foreach (var r in boundRect)
+			{
+				x++;
 
+				var img = q1.Copy();
 
-            Invoke(new Action(delegate { Progress(50, "Robienie innych rzeczy..."); }));
-            var boundRect = new List<Rectangle>();
+				img.ROI = r;
 
-            for (var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
-            var x = 0;
+				puzzels.Add(img);
 
-            var puzzels = new List<Image<Bgr, byte>>();
+				q1.Rectangle(r, new MCvScalar(255, 0, 255));
 
-            foreach (var r in boundRect)
-            {
-                x++;
-                if (x == boundRect.Count / 3) Invoke(new Action(delegate { Progress(60); }));
-                if (x == (2 * boundRect.Count) / 3) Invoke(new Action(delegate { Progress(70); }));
-                var img = q1.Copy();
-                img.ROI = r;
-                puzzels.Add(img.Copy());
-                CvInvoke.Rectangle(q1, r, new MCvScalar(250, 0, 250), 10);
-                CvInvoke.PutText
-                (
-                    q1
-                    , x.ToString()
-                    , new Point(r.X + r.Width / 2, r.Y + r.Height / 2)
-                    , FontFace.HersheySimplex
-                    , 8
-                    , new MCvScalar(255, 0, 255)
-                    , 10);
-            }
+				q1.PutText(x.ToString(), new Point(r.X + r.Width / 2, r.Y + r.Height / 2), new MCvScalar(255, 0, 255), FontFace.HersheySimplex, 8, 10);
+			}
 
-            Invoke(new Action(delegate { Progress(80, "Zapisywanie"); }));
+			Invoke(new Action(delegate { Progress(60); }));
 
+			foreach (var puzzel in puzzels)
+			{
+				var q6 = puzzel.Convert<Gray, byte>().Copy().AdaptiveThreshold().Dilate();
 
-            foreach (Image<Bgr, byte> puzzel in puzzels)
-            {
-                Image<Gray, Byte> gray = puzzel.Convert<Gray, Byte>();
-                Mat hierarchy = new Mat();
-                VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint();
-                Image<Gray, Byte> Imgout = gray;
+				var w7 = ExtensionMethods.FindContours(q6);
 
-                CvInvoke.AdaptiveThreshold(gray, Imgout, 250, Emgu.CV.CvEnum.AdaptiveThresholdType.MeanC, ThresholdType.BinaryInv, 39, 4);
-                Imgout._Dilate(5);
-               // Imgout._Erode(3);
+				var max = new VectorOfVectorOfPoint();
 
-                CvInvoke.FindContours(Imgout, contours, hierarchy, Emgu.CV.CvEnum.RetrType.External, Emgu.CV.CvEnum.ChainApproxMethod.ChainApproxSimple);
+				max.Push(w7.Item1[0]);
 
-                VectorOfVectorOfPoint Max = new VectorOfVectorOfPoint();
-                Max.Push(contours[0]);
+				for (var i = 0; i < w7.Item1.Size; i++)
+				{
+					if (!(CvInvoke.ContourArea(w7.Item1[i]) > CvInvoke.ContourArea(max[0]))) continue;
+					max.Clear();
+					max.Push(w7.Item1[i]);
+				}
 
-                for (int i = 0; i < contours.Size; i++)
-                {
-                    if (CvInvoke.ContourArea(contours[i], false) > CvInvoke.ContourArea(Max[0], false))
-                    {
-                        Max.Clear();
-                        Max.Push(contours[i]);
-                      
-                    }
-                }
+				Invoke(new Action(delegate { Progress(65); }));
 
-                Image<Bgr, Byte> puzzelcopy = puzzel.Clone();
+				//TODO Optimalize this !!!
+				//Usuwanie tła
+				//var puzzelcopy = puzzel.Clone().FillPoly(max, new MCvScalar(0, 0, 255));
+				//for (var j = 1; j < puzzelcopy.Cols; j++)
+				//{
+				//	for (var i = 1; i < puzzelcopy.Rows; i++)
+				//	{
+				//		if (!puzzelcopy[i, j].Equals(new Bgr(0, 0, 255)))
+				//		{
+				//			puzzel[i, j] = new Bgr(Color.Transparent);
+				//		}
+				//	}
+				//}
+			}
 
-                CvInvoke.FillPoly(puzzelcopy, Max, new MCvScalar(0, 0, 255)); //zamalowuje puzzle\
-              
-                   Bgr white = new Bgr(0, 0, 255);
-                Bgr transparent = new Bgr(Color.Transparent);
-                
-                Bitmap copy = new Bitmap(puzzelcopy.Bitmap);
+			Invoke(new Action(delegate { Progress(70); }));
 
-                for (int j = 1; j < puzzelcopy.Cols; j++)
-                {
-                    for (int i = 1; i < puzzelcopy.Rows; i++)
-                    {
-                        if(!puzzelcopy[i,j].Equals(white))
-                       // if (!copy.GetPixel(i,j).Equals(Color.White))
-                        {
-                            puzzel[i, j] = transparent;
-                        }
+			var k1 = q1.Copy();
+			var surf = new SURF(600);
 
-                       
-                    }
-                }
+			//TODO zdjęcie z ułożonymi puzzlami
+			var orginal = new Image<Bgr, byte>(ExtensionMethods.ImagePath); //tu powinna być ścieżka
 
+			var copyOrginal = orginal.Copy();
 
-               // ExtensionMethods.ImageOut.Add(puzzel.ToBitmap()); dodanie do wyśietlanych
-            }
-            //	ExtensionMethods.ImageOut.Add(q5.ToBitmap());
+			var dac1 = surf.DetectAndCompute(q1);
+			var dac2 = surf.DetectAndCompute(copyOrginal);
 
-            //rozpoznawanie -> keypoints 
-            //tak nawaliłem trochę kodu
+			Features2DToolbox.DrawKeypoints(q1, dac1.Item1, k1, new Bgr(0, 255, 0));
+			Features2DToolbox.DrawKeypoints(orginal, dac2.Item1, copyOrginal, new Bgr(0, 255, 0));
 
-            /* */var k1 = q1.Copy(); //dla wybranego obrazka
-                 SURF surf = new SURF(600); //surf 
-                 var keypoints = new VectorOfKeyPoint(); //keyponty
-                 UMat kdesc = new UMat();
-                 surf.DetectAndCompute(q1, null, keypoints, kdesc, false);
+			Invoke(new Action(delegate { Progress(75); }));
 
-                 Features2DToolbox.DrawKeypoints(q1, keypoints, k1, new Bgr(0, 255, 0));
-                 //jeśli chcemy uzywac keypointów logiczne jest że musimy miec orginał...
-                 //więc
-                 // var orginal = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
-                 //żartuje , nie chce mi się dodawać na razie metody dodawania drugiego obrazka więc
-                 var orginal = new Image<Bgr, byte>("path"); //tu powinna być ścieżka
+			//dopasowywanie
+			var matcher = new BFMatcher(DistanceType.L2);
+			var matches = new VectorOfVectorOfDMatch();
 
-                 var copyOrginal = orginal.Copy();
-                 var orginalKeypoints = new VectorOfKeyPoint(); //keyponty
-                 UMat odesc = new UMat();
-                 surf.DetectAndCompute(copyOrginal, null, orginalKeypoints, odesc, false);
+			matcher.KnnMatch(dac1.Item2, matches, 2, null);
 
-                 Features2DToolbox.DrawKeypoints(orginal, orginalKeypoints, copyOrginal, new Bgr(0, 255, 0));
-
-                 //dopasowywanie
-                 BFMatcher matcher = new BFMatcher(DistanceType.L2);
-                 VectorOfVectorOfDMatch matches = new VectorOfVectorOfDMatch();
-                 matcher.Add(odesc);
-                 matcher.KnnMatch(kdesc, matches, 2, null);
+			matcher.Add(dac2.Item2);
 
 
-                 Mat result = new Mat();
+			var result = new Mat();
+			var res = new Image<Bgr, byte>(result.Bitmap);
+			Features2DToolbox.DrawMatches(copyOrginal, dac2.Item1, k1, dac1.Item1, matches, result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255));
 
-                 Features2DToolbox.DrawMatches(copyOrginal, orginalKeypoints, k1, keypoints, matches, result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
+			
 
+			foreach (var puzzel in puzzels)
+			{
+				var dac3 = surf.DetectAndCompute(puzzel);
 
-                 Image<Bgr, Byte> res = new Image<Bgr, Byte>(result.Bitmap);
+				var puzzelmatches = new VectorOfVectorOfDMatch();
+				var Result = new Mat();
 
+				matcher.KnnMatch(dac3.Item2, puzzelmatches, 3, null);
+				
+				Features2DToolbox.DrawMatches(copyOrginal, dac2.Item1, puzzel, dac2.Item1, puzzelmatches, Result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
+				var MachedPuzzel = new Image<Bgr, Byte>(Result.Bitmap);
 
+				ExtensionMethods.ImageOut.Add(MachedPuzzel.ToBitmap());
+				//  Bgr color = puzzel[0, 0]; //czytanie koloru (przydatne do układania kolorami)
+				//System.Console.Out.Write(color.ToString());
+			}
 
+			Invoke(new Action(delegate { Progress(95, "Zapisywanie..."); }));
 
+			ExtensionMethods.ImageOut.Add(res.ToBitmap());
+			ExtensionMethods.ImageOut.Add(k1.ToBitmap());
+			ExtensionMethods.ImageOut.Add(copyOrginal.ToBitmap());
+			ExtensionMethods.ImageOut.Add(q1.ToBitmap());
 
+			Invoke(new Action(delegate { Progress(100, "DONE"); }));
 
-                 foreach (Image<Bgr, byte> puzzel in puzzels)
-                 {
-                     var puzzelpoints = new VectorOfKeyPoint(); //keyponty
-                     UMat pdesc = new UMat();
-                     surf.DetectAndCompute(puzzel, null, puzzelpoints, pdesc, false);
+			watch.Stop();
+			var elapsedMs = watch.Elapsed.TotalSeconds / 60;
 
-                     VectorOfVectorOfDMatch puzzelmatches = new VectorOfVectorOfDMatch();
-                     matcher.KnnMatch(pdesc, puzzelmatches, 3, null);
-                     Mat Result = new Mat();
-                     Features2DToolbox.DrawMatches(copyOrginal, orginalKeypoints, puzzel, puzzelpoints, puzzelmatches, Result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
-                     Image<Bgr, Byte> MachedPuzzel = new Image<Bgr, Byte>(Result.Bitmap);
-
-                      ExtensionMethods.ImageOut.Add(MachedPuzzel.ToBitmap());
-                     //  Bgr color = puzzel[0, 0]; //czytanie koloru (przydatne do układania kolorami)
-                     //System.Console.Out.Write(color.ToString());
-                 }
-
-
-                 ExtensionMethods.ImageOut.Add(res.ToBitmap());
-                 ExtensionMethods.ImageOut.Add(k1.ToBitmap());
-                 ExtensionMethods.ImageOut.Add(copyOrginal.ToBitmap());
-            ExtensionMethods.ImageOut.Add(q1.ToBitmap());
-
-
-            Invoke(new Action(delegate { Progress(100, "DONE"); }));
-
-            Thread.Sleep(100);
-        }
+			Thread.Sleep(100);
+		}
 
 		private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
 		{
