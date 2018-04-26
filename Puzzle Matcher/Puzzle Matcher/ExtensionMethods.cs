@@ -151,6 +151,142 @@ namespace Puzzle_Matcher
 			return new Tuple<VectorOfKeyPoint, UMat>(keyPoints, descriptors);
 		}
 
+		public static int[] placePuzzels(int hort, int vert, double[] avgX, double[] avgY) //układanie puzzli po średnich punktach (keypoints)
+		{
+			//mały init :D
+			double[] copyavgX = (double[])avgX.Clone();
+			double[] copyavgY = (double[])avgY.Clone();
+
+			int[] tabX = new int[avgX.Length];
+			int[] tabY = new int[avgY.Length];
+
+			Array.Sort(avgX);
+
+			for (int i = 0; i < avgX.Length; i++)
+			{
+				for (int j = 0; j < avgX.Length; j++)
+				{
+
+
+					if (avgX[i] == copyavgX[j])
+					{
+						tabX[i] = j;
+					}
+				}
+			}
+
+			Array.Sort(avgY);
+
+			for (int i = 0; i < avgY.Length; i++)
+			{
+				for (int j = 0; j < avgY.Length; j++)
+				{
+					if (avgY[i] == copyavgY[j])
+					{
+						tabY[i] = j;
+					}
+				}
+			}
+
+
+			if (hort >= vert)
+			{
+				int[] puzzelOrder = new int[(hort * vert)];
+				List<int[]> blocks = new List<int[]>();
+
+				for (int i = 0; i < (hort * vert); i++)
+				{
+					if (i % hort == 0)
+					{
+						int[] block = new int[hort];
+						for (int j = 0; j < hort; j++)
+						{
+							block[j] = tabY[i + j];
+						}
+						blocks.Add(block);
+					}
+				}
+
+
+				int counter = 0;
+				foreach (int[] block in blocks)
+				{
+					for (int j = 0; j < tabX.Length; j++)
+					{
+						for (int i = 0; i < block.Length; i++)
+						{
+							if (block[i] == tabX[j])
+							{
+								puzzelOrder[counter] = block[i];
+								counter++;
+							}
+						}
+					}
+
+				}
+
+				return puzzelOrder;
+
+
+			}
+			else
+			{
+
+				int[] puzzelOrder = new int[(hort * vert)];
+				List<int[]> blocks = new List<int[]>();
+
+				for (int i = 0; i < (hort * vert); i++)
+				{
+					if (i % vert == 0)
+					{
+						int[] block = new int[vert];
+						for (int j = 0; j < vert; j++)
+						{
+							block[j] = tabX[i + j];
+						}
+						blocks.Add(block);
+					}
+				}
+
+				int counter = 0;
+				foreach (int[] block in blocks)
+				{
+					for (int j = 0; j < tabY.Length; j++)
+					{
+						for (int i = 0; i < block.Length; i++)
+						{
+							if (block[i] == tabY[j])
+							{
+								puzzelOrder[counter] = block[i];
+								counter++;
+							}
+						}
+					}
+
+				}
+
+				//zamiana na -> \|/ kolejność
+				int[] puzzelOrdercopy = (int[])puzzelOrder.Clone();
+				counter = 0;
+				int bigcounter = 1;
+				for (int i = 0; i < puzzelOrder.Length; i++)
+				{
+
+					puzzelOrder[i] = puzzelOrdercopy[counter];
+					counter += vert;
+					if (counter >= puzzelOrder.Length)
+					{
+						counter = bigcounter;
+						bigcounter++;
+					}
+				}
+
+				return puzzelOrder;
+			}
+
+
+		}
+
 		#endregion ExtensionMethods
 	}
 }
