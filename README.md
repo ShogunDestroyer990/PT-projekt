@@ -26,12 +26,7 @@ Whole documentation under [this file](https://github.com/ShogunDestroyer990/PT-p
 * Mateusz Grabuszyński [GitHub](https://github.com/MateuszGrabuszynski)
 For provided many input images.
 
-### Special thanks to:
-* P1
-* P2
-
 ## Creators
-
 **Adam Godziński**
 - <https://github.com/ShogunDestroyer990>
 
