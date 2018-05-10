@@ -1,4 +1,4 @@
-#PuzzleMatcher
+PuzzleMatcher
 =======================
 
 ## Table of contents
@@ -19,17 +19,18 @@ Aplication that allows you to match puzzles from images.
 ##### 2. .NET Framework 4.6.1
 
 
-##Documentation
+## Documentation
 Whole documentation under [this file](https://github.com/ShogunDestroyer990/PT-projekt/blob/master/documentation.pdf)
 
 ## Attributions
-//To whom we want thanks for.
+* Mateusz Grabuszyński [GitHub](https://github.com/MateuszGrabuszynski)
+For provided many input images.
 
 ### Special thanks to:
-*P1
-*P2
+* P1
+* P2
 
-##Creators
+## Creators
 
 **Adam Godziński**
 - <https://github.com/ShogunDestroyer990>
@@ -37,6 +38,5 @@ Whole documentation under [this file](https://github.com/ShogunDestroyer990/PT-p
 **Dawid Korach**
 - <https://github.com/E34tf>
 
-##License
--------
+## License
 Code released under the [MIT License](https://github.com/ShogunDestroyer990/PT-projekt/blob/master/LICENSE.md).

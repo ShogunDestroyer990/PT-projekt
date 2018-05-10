@@ -35,17 +35,25 @@ namespace Puzzle_Matcher
 			this.ImageIn = new System.Windows.Forms.PictureBox();
 			this.ProcessImage = new System.Windows.Forms.PictureBox();
 			this.ofd = new System.Windows.Forms.OpenFileDialog();
+			this.OrginalImg = new System.Windows.Forms.PictureBox();
+			this.X_axis = new System.Windows.Forms.NumericUpDown();
+			this.label1 = new System.Windows.Forms.Label();
+			this.label2 = new System.Windows.Forms.Label();
+			this.Y_axis = new System.Windows.Forms.NumericUpDown();
 			((System.ComponentModel.ISupportInitialize)(this.ImageIn)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ProcessImage)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.OrginalImg)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.X_axis)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// ImageIn
 			// 
 			this.ImageIn.Image = global::Puzzle_Matcher.Properties.Resources.ButtonLoadImage;
 			this.ImageIn.InitialImage = null;
-			this.ImageIn.Location = new System.Drawing.Point(13, 13);
+			this.ImageIn.Location = new System.Drawing.Point(13, 12);
 			this.ImageIn.Name = "ImageIn";
-			this.ImageIn.Size = new System.Drawing.Size(759, 431);
+			this.ImageIn.Size = new System.Drawing.Size(376, 400);
 			this.ImageIn.TabIndex = 0;
 			this.ImageIn.TabStop = false;
 			this.ImageIn.Click += new System.EventHandler(this.ImageIn_Click);
@@ -55,7 +63,7 @@ namespace Puzzle_Matcher
 			this.ProcessImage.Enabled = false;
 			this.ProcessImage.Image = global::Puzzle_Matcher.Properties.Resources.ButtonProcessImage;
 			this.ProcessImage.InitialImage = null;
-			this.ProcessImage.Location = new System.Drawing.Point(12, 450);
+			this.ProcessImage.Location = new System.Drawing.Point(12, 444);
 			this.ProcessImage.Name = "ProcessImage";
 			this.ProcessImage.Size = new System.Drawing.Size(760, 100);
 			this.ProcessImage.TabIndex = 1;
@@ -70,11 +78,89 @@ namespace Puzzle_Matcher
 			this.ofd.InitialDirectory = "%HOMEPATH%";
 			this.ofd.Title = "Wybierz zdjęcie";
 			// 
+			// OrginalImg
+			// 
+			this.OrginalImg.Image = global::Puzzle_Matcher.Properties.Resources.ButtonLoadImage;
+			this.OrginalImg.InitialImage = null;
+			this.OrginalImg.Location = new System.Drawing.Point(396, 12);
+			this.OrginalImg.Name = "OrginalImg";
+			this.OrginalImg.Size = new System.Drawing.Size(376, 400);
+			this.OrginalImg.TabIndex = 2;
+			this.OrginalImg.TabStop = false;
+			this.OrginalImg.Click += new System.EventHandler(this.OrginalImg_Click);
+			// 
+			// X_axis
+			// 
+			this.X_axis.Location = new System.Drawing.Point(135, 417);
+			this.X_axis.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.X_axis.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.X_axis.Name = "X_axis";
+			this.X_axis.Size = new System.Drawing.Size(46, 20);
+			this.X_axis.TabIndex = 3;
+			this.X_axis.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(13, 419);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(116, 13);
+			this.label1.TabIndex = 4;
+			this.label1.Text = "Ilość puzzli w poziomie:";
+			// 
+			// label2
+			// 
+			this.label2.AutoSize = true;
+			this.label2.Location = new System.Drawing.Point(234, 419);
+			this.label2.Name = "label2";
+			this.label2.Size = new System.Drawing.Size(103, 13);
+			this.label2.TabIndex = 6;
+			this.label2.Text = "Ilość puzzli w pionie:";
+			// 
+			// Y_axis
+			// 
+			this.Y_axis.Location = new System.Drawing.Point(343, 417);
+			this.Y_axis.Maximum = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+			this.Y_axis.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			this.Y_axis.Name = "Y_axis";
+			this.Y_axis.Size = new System.Drawing.Size(46, 20);
+			this.Y_axis.TabIndex = 5;
+			this.Y_axis.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(784, 562);
+			this.Controls.Add(this.label2);
+			this.Controls.Add(this.Y_axis);
+			this.Controls.Add(this.label1);
+			this.Controls.Add(this.X_axis);
+			this.Controls.Add(this.OrginalImg);
 			this.Controls.Add(this.ProcessImage);
 			this.Controls.Add(this.ImageIn);
 			this.HelpButton = true;
@@ -84,7 +170,11 @@ namespace Puzzle_Matcher
 			this.Text = "Okno główne";
 			((System.ComponentModel.ISupportInitialize)(this.ImageIn)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.ProcessImage)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.OrginalImg)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.X_axis)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).EndInit();
 			this.ResumeLayout(false);
+			this.PerformLayout();
 
 		}
 
@@ -93,6 +183,11 @@ namespace Puzzle_Matcher
 		private PictureBox ImageIn;
 		private PictureBox ProcessImage;
 		private OpenFileDialog ofd;
+		private PictureBox OrginalImg;
+		private NumericUpDown X_axis;
+		private Label label1;
+		private Label label2;
+		private NumericUpDown Y_axis;
 	}
 }
 

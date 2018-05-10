@@ -2,6 +2,7 @@
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using Emgu.CV.XFeatures2D;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -16,51 +17,9 @@ namespace Puzzle_Matcher
 	{
 		public static string ImagePath { get; set; }
 
+		public static string OrginalImagePath { get; set; }
+
 		public static List<Bitmap> ImageOut { get; } = new List<Bitmap>();
-
-		public static void FindEdges()
-		{
-			var q1 = new Image<Bgr, byte>(ImagePath);
-			var q2 = q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate().Erode();
-
-			var w3 = FindContours(q2.Copy());
-
-			var avg = CalculateAvreage(w3.Item1);
-
-			var e4 = new VectorOfVectorOfPoint();
-
-			for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
-
-			var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
-
-			var boundRect = new List<Rectangle>();
-
-			for (var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
-			var x = 0;
-
-			var puzzels = new List<Image<Bgr, byte>>();
-
-			foreach (var r in boundRect)
-			{
-				x++;
-				var img = q1.Copy();
-				img.ROI = r;
-				puzzels.Add(img.Copy());
-				CvInvoke.Rectangle(q1, r, new MCvScalar(250, 0, 250), 10);
-				CvInvoke.PutText
-				(
-					q1
-					, x.ToString()
-					, new Point(r.X + r.Width / 2, r.Y + r.Height / 2)
-					, FontFace.HersheySimplex
-					, 8
-					, new MCvScalar(255, 0, 255)
-					, 10);
-			}
-
-			ImageOut.Add(q1.ToBitmap());
-			ImageOut.Add(q5.ToBitmap());
-		}
 
 		#region ExtensionMethods
 
@@ -163,6 +122,173 @@ namespace Puzzle_Matcher
 			var outImage = inImage.Copy();
 			CvInvoke.PutText(outImage, text, where, fontFace, fontScale, color, thickness);
 			return outImage;
+		}
+
+		public static Image<Bgr, byte> Rectangle(this Image<Bgr, byte> inImage, Rectangle r, MCvScalar color, int thickness = 10, LineType lt = LineType.EightConnected, int shift = 0)
+		{
+			var outImage = inImage.Copy();
+			CvInvoke.Rectangle(outImage, r, color, thickness, lt, shift);
+			return outImage;
+		}
+
+		public static Image<Bgr, byte> FillPoly(this Image<Bgr, byte> inImage, VectorOfVectorOfPoint points, MCvScalar color, LineType lt = LineType.EightConnected, int shift = 0, Point offset = default(Point))
+		{
+			var outImage = inImage.Copy();
+			CvInvoke.FillPoly(outImage, points, color, lt, shift, offset);
+			return outImage;
+		}
+
+		public static UMat DetectAndCompute(this SURF s, Image<Bgr, byte> inImage, VectorOfKeyPoint keyPoints, IInputArray iia = null, bool useProvidedKeyPoints = true)
+		{
+			var descriptors = new UMat();
+			s.DetectAndCompute(inImage, iia, keyPoints, descriptors, useProvidedKeyPoints);
+			return descriptors;
+		}
+
+		public static Tuple<VectorOfKeyPoint, UMat> DetectAndCompute(this SURF s, Image<Bgr, byte> inImage, IInputArray iia = null, bool useProvidedKeyPoints = false)
+		{
+			var descriptors = new UMat();
+			var keyPoints = new VectorOfKeyPoint();
+			s.DetectAndCompute(inImage, iia, keyPoints, descriptors, useProvidedKeyPoints);
+			return new Tuple<VectorOfKeyPoint, UMat>(keyPoints, descriptors);
+		}
+
+		public static Image DrawSymbol(this Image img, string symbol, Brush backgroundBrush, Font font, Brush textBrush)
+		{
+			using (var g = Graphics.FromImage(img))
+			{
+				g.FillRectangle(backgroundBrush, 0, 0, img.Width, img.Height);
+				g.SmoothingMode = SmoothingMode.AntiAlias;
+				g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+				g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+				g.DrawString(symbol, font, textBrush, new Point(img.Width / 2, img.Height / 2), new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+				g.Flush();
+			}
+			return img;
+		}
+
+		public static int[] PlacePuzzels(int hort, int vert, double[] avgX, double[] avgY) //układanie puzzli po średnich punktach (keypoints)
+		{
+			//mały init :D
+			double[] copyavgX = (double[])avgX.Clone();
+			double[] copyavgY = (double[])avgY.Clone();
+
+			int[] tabX = new int[avgX.Length];
+			int[] tabY = new int[avgY.Length];
+
+			Array.Sort(avgX);
+
+			for (int i = 0; i < avgX.Length; i++)
+			{
+				for (int j = 0; j < avgX.Length; j++)
+				{
+					if (avgX[i] == copyavgX[j])
+					{
+						tabX[i] = j;
+					}
+				}
+			}
+
+			Array.Sort(avgY);
+
+			for (int i = 0; i < avgY.Length; i++)
+			{
+				for (int j = 0; j < avgY.Length; j++)
+				{
+					if (avgY[i] == copyavgY[j])
+					{
+						tabY[i] = j;
+					}
+				}
+			}
+
+			if (hort >= vert)
+			{
+				int[] puzzelOrder = new int[(hort * vert)];
+				List<int[]> blocks = new List<int[]>();
+
+				for (int i = 0; i < (hort * vert); i++)
+				{
+					if (i % hort == 0)
+					{
+						int[] block = new int[hort];
+						for (int j = 0; j < hort; j++)
+						{
+							block[j] = tabY[i + j];
+						}
+						blocks.Add(block);
+					}
+				}
+
+				int counter = 0;
+				foreach (int[] block in blocks)
+				{
+					for (int j = 0; j < tabX.Length; j++)
+					{
+						for (int i = 0; i < block.Length; i++)
+						{
+							if (block[i] == tabX[j])
+							{
+								puzzelOrder[counter] = block[i];
+								counter++;
+							}
+						}
+					}
+				}
+
+				return puzzelOrder;
+			}
+			else
+			{
+				int[] puzzelOrder = new int[(hort * vert)];
+				List<int[]> blocks = new List<int[]>();
+
+				for (int i = 0; i < (hort * vert); i++)
+				{
+					if (i % vert == 0)
+					{
+						int[] block = new int[vert];
+						for (int j = 0; j < vert; j++)
+						{
+							block[j] = tabX[i + j];
+						}
+						blocks.Add(block);
+					}
+				}
+
+				int counter = 0;
+				foreach (int[] block in blocks)
+				{
+					for (int j = 0; j < tabY.Length; j++)
+					{
+						for (int i = 0; i < block.Length; i++)
+						{
+							if (block[i] == tabY[j])
+							{
+								puzzelOrder[counter] = block[i];
+								counter++;
+							}
+						}
+					}
+				}
+
+				//zamiana na -> \|/ kolejność
+				int[] puzzelOrdercopy = (int[])puzzelOrder.Clone();
+				counter = 0;
+				int bigcounter = 1;
+				for (int i = 0; i < puzzelOrder.Length; i++)
+				{
+					puzzelOrder[i] = puzzelOrdercopy[counter];
+					counter += vert;
+					if (counter >= puzzelOrder.Length)
+					{
+						counter = bigcounter;
+						bigcounter++;
+					}
+				}
+
+				return puzzelOrder;
+			}
 		}
 
 		#endregion ExtensionMethods
