@@ -40,11 +40,14 @@ namespace Puzzle_Matcher
 			this.label1 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
 			this.Y_axis = new System.Windows.Forms.NumericUpDown();
+			this.prog = new System.Windows.Forms.NumericUpDown();
+			this.label3 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.ImageIn)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ProcessImage)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.OrginalImg)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.X_axis)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.prog)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// ImageIn
@@ -151,11 +154,44 @@ namespace Puzzle_Matcher
             0,
             0});
 			// 
+			// prog
+			// 
+			this.prog.Location = new System.Drawing.Point(579, 418);
+			this.prog.Maximum = new decimal(new int[] {
+            10000,
+            0,
+            0,
+            0});
+			this.prog.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+			this.prog.Name = "prog";
+			this.prog.Size = new System.Drawing.Size(68, 20);
+			this.prog.TabIndex = 7;
+			this.prog.Value = new decimal(new int[] {
+            920,
+            0,
+            0,
+            0});
+			// 
+			// label3
+			// 
+			this.label3.AutoSize = true;
+			this.label3.Location = new System.Drawing.Point(395, 420);
+			this.label3.Name = "label3";
+			this.label3.Size = new System.Drawing.Size(178, 13);
+			this.label3.TabIndex = 8;
+			this.label3.Text = "Wielkość konturów (domyślne: 920):";
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(784, 562);
+			this.Controls.Add(this.label3);
+			this.Controls.Add(this.prog);
 			this.Controls.Add(this.label2);
 			this.Controls.Add(this.Y_axis);
 			this.Controls.Add(this.label1);
@@ -173,6 +209,7 @@ namespace Puzzle_Matcher
 			((System.ComponentModel.ISupportInitialize)(this.OrginalImg)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.X_axis)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.prog)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -188,6 +225,8 @@ namespace Puzzle_Matcher
 		private Label label1;
 		private Label label2;
 		private NumericUpDown Y_axis;
+		private NumericUpDown prog;
+		private Label label3;
 	}
 }
 

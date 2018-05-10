@@ -1,15 +1,13 @@
-﻿using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using Emgu.CV.XFeatures2D;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-
-//TODO Przemysleć przechowywanie zmiennych tymczasowych zamiast "object[]"
+using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Emgu.CV.XFeatures2D;
 
 namespace Puzzle_Matcher
 {
@@ -167,6 +165,78 @@ namespace Puzzle_Matcher
 			return img;
 		}
 
+		public static Image<Bgr, byte> generateFinalpicture(int puzzelX, int puzzelY, int[] resultTab, List<Image<Bgr, byte>> puzzels)
+		{// puzzelX i Y przedstawiajają jak ma być ułożony obraz
+			int puzzelCounter = puzzelX * puzzelY;
+			int finalsumX = 0;
+			int finalsumY = 0;
+			bool mumIsFinalPicDone = false;
+			int picId = 0;
+
+			int puzzelXcounter = 0;
+			//nie chce mi się......
+			int avragepuzzelSize = 0;
+			foreach (Image<Bgr, byte> puzzel in puzzels)
+			{
+
+				avragepuzzelSize += puzzel.Width;
+				avragepuzzelSize += puzzel.Height;
+			}
+
+			avragepuzzelSize /= (puzzelCounter * 2);
+
+
+
+			var finalPic = new Image<Bgr, byte>((avragepuzzelSize * puzzelX), (avragepuzzelSize * puzzelY));
+			int counterino = 0;
+
+
+			while (mumIsFinalPicDone == false)
+			{
+				foreach (Image<Bgr, byte> puzzel in puzzels)
+				{
+
+					if (picId == resultTab[counterino])
+					{
+
+
+						if (puzzelX == puzzelXcounter)
+						{
+							puzzelXcounter = 0;
+							finalsumX = 0;
+							finalsumY += avragepuzzelSize;
+						}
+
+
+						finalPic.ROI = new Rectangle(finalsumX, finalsumY, avragepuzzelSize, avragepuzzelSize);
+
+						Image<Bgr, byte> resizedImage = puzzel.Resize(avragepuzzelSize, avragepuzzelSize, Inter.Linear);
+
+						resizedImage.CopyTo(finalPic);
+
+						finalPic.ROI = System.Drawing.Rectangle.Empty;
+						finalsumX += avragepuzzelSize;
+
+
+					}
+					picId++;
+				}
+
+				if ((counterino + 1) == puzzelCounter)
+				{
+					mumIsFinalPicDone = true;
+				}
+				else
+				{
+					picId = 0;
+					counterino++;
+					puzzelXcounter++;
+
+				}
+			}
+			return finalPic;
+		}
+
 		public static int[] PlacePuzzels(int hort, int vert, double[] avgX, double[] avgY) //układanie puzzli po średnich punktach (keypoints)
 		{
 			//mały init :D
@@ -178,10 +248,12 @@ namespace Puzzle_Matcher
 
 			Array.Sort(avgX);
 
-			for (int i = 0; i < avgX.Length; i++)
+			for (var i = 0; i < avgX.Length; i++)
 			{
-				for (int j = 0; j < avgX.Length; j++)
+				for (var j = 0; j < avgX.Length; j++)
 				{
+
+
 					if (avgX[i] == copyavgX[j])
 					{
 						tabX[i] = j;
@@ -202,6 +274,7 @@ namespace Puzzle_Matcher
 				}
 			}
 
+
 			if (hort >= vert)
 			{
 				int[] puzzelOrder = new int[(hort * vert)];
@@ -220,6 +293,7 @@ namespace Puzzle_Matcher
 					}
 				}
 
+
 				int counter = 0;
 				foreach (int[] block in blocks)
 				{
@@ -234,12 +308,16 @@ namespace Puzzle_Matcher
 							}
 						}
 					}
+
 				}
 
 				return puzzelOrder;
+
+
 			}
 			else
 			{
+
 				int[] puzzelOrder = new int[(hort * vert)];
 				List<int[]> blocks = new List<int[]>();
 
@@ -270,6 +348,7 @@ namespace Puzzle_Matcher
 							}
 						}
 					}
+
 				}
 
 				//zamiana na -> \|/ kolejność
@@ -278,6 +357,7 @@ namespace Puzzle_Matcher
 				int bigcounter = 1;
 				for (int i = 0; i < puzzelOrder.Length; i++)
 				{
+
 					puzzelOrder[i] = puzzelOrdercopy[counter];
 					counter += vert;
 					if (counter >= puzzelOrder.Length)
@@ -289,7 +369,142 @@ namespace Puzzle_Matcher
 
 				return puzzelOrder;
 			}
+
+
 		}
+
+		public static int[] assumePuzzelConfiguration(double[] avgPuzellXPoints, double[] avgPuzellYPoints, int puzzelCounter)
+		{
+			//dużo pętel
+			//nie chce mi sie
+			//ale działa
+			double akumX = 0;
+			double akumY = 0;
+
+			int[] options = new int[puzzelCounter]; //tablica zawsze będzie za duża :\
+			int cunt = 0;
+
+			for (int i = 1; i <= puzzelCounter; i++)
+			{
+				if (puzzelCounter % i == 0)
+				{
+					options[cunt] = i;
+					cunt++;
+				}
+			}
+
+
+			for (int i = 0; i < puzzelCounter; i++)
+			{
+				akumX += avgPuzellXPoints[i];
+				akumY += avgPuzellYPoints[i];
+
+
+			} //liczenie średniej
+
+			akumX /= puzzelCounter;
+			akumY /= puzzelCounter;
+			int scoreX = 0;
+			int scoreY = 0;
+			cunt = 0;
+			for (int i = 0; i < puzzelCounter; i++)
+			{
+				if ((akumX * 1.02) > avgPuzellXPoints[i] && (akumX * 0.98) < avgPuzellXPoints[i])  //ahh nie mam pomysłów
+				{
+					scoreX++;
+				}
+
+				if ((akumY * 1.02) > avgPuzellYPoints[i] && (akumY * 0.98) < avgPuzellYPoints[i])
+				{
+					scoreY++;
+				}
+
+				if (options[i] != 0)
+				{
+					cunt++;
+				}
+			}//liczenie wyniku
+
+			int[] difrenceX = new int[cunt];
+			int[] difrenceY = new int[cunt];
+
+			bool waitfordecisionX = false;
+
+			bool waitfordecisionY = false;
+
+			int minimumX = puzzelCounter;
+			int minimumY = puzzelCounter;
+
+			int[] decision = new int[2]; //0 -> X  1->Y
+
+
+			for (int i = 0; i < cunt; i++)
+			{
+				difrenceX[i] = Math.Abs(options[i] - scoreX);
+				difrenceY[i] = Math.Abs(options[i] - scoreY);
+
+				if (difrenceX[i] == minimumX)
+				{
+					waitfordecisionX = true;
+				}
+
+				if (difrenceY[i] == minimumY)
+				{
+					waitfordecisionY = true;
+				}
+
+				if (difrenceX[i] < minimumX)
+				{
+					minimumX = difrenceX[i];
+					waitfordecisionX = false;
+					decision[0] = options[i];
+				}
+
+				if (difrenceY[i] < minimumY)
+				{
+					minimumY = difrenceY[i];
+					waitfordecisionY = false;
+					decision[1] = options[i];
+				}
+
+
+				// CvInvoke.PutText(k1, difrenceX[i].ToString(), new Point(100, 1800 + (100 * i)), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
+				// CvInvoke.PutText(k1, difrenceY[i].ToString(), new Point(1500, 1800 + (100 * i)), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
+
+			}//im bliżej zera tym lepiej zliczanie różnicy
+
+			/* */
+
+			if (waitfordecisionX == true)
+			{
+				for (int i = 0; i < cunt; i++)
+				{
+					if (decision[1] == options[i])
+					{
+						decision[0] = options[cunt - 1 - i];
+					}
+				}
+
+			}
+
+			if (waitfordecisionY == true)
+			{
+				for (int i = 0; i < cunt; i++)
+				{
+					if (decision[1] == options[i])
+					{
+						decision[0] = options[cunt - 1 - i];
+					}
+				}
+
+			}
+			//jeśli się powtarzazły to wybieramy odwrotność
+			//to pewnie nie będzie działać za często
+			//przyda się opcja w menu żeby urzytkownik wybrał czy chce tego używać czy nie
+
+			return decision;
+		}
+
 
 		#endregion ExtensionMethods
 	}
