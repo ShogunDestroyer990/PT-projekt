@@ -17,6 +17,8 @@ namespace Puzzle_Matcher
 	{
 		public static string ImagePath { get; set; }
 
+		public static string OrginalImagePath { get; set; }
+
 		public static List<Bitmap> ImageOut { get; } = new List<Bitmap>();
 
 		#region ExtensionMethods
@@ -151,7 +153,21 @@ namespace Puzzle_Matcher
 			return new Tuple<VectorOfKeyPoint, UMat>(keyPoints, descriptors);
 		}
 
-		public static int[] placePuzzels(int hort, int vert, double[] avgX, double[] avgY) //układanie puzzli po średnich punktach (keypoints)
+		public static Image DrawSymbol(this Image img, string symbol, Brush backgroundBrush, Font font, Brush textBrush)
+		{
+			using (var g = Graphics.FromImage(img))
+			{
+				g.FillRectangle(backgroundBrush, 0, 0, img.Width, img.Height);
+				g.SmoothingMode = SmoothingMode.AntiAlias;
+				g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+				g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+				g.DrawString(symbol, font, textBrush, new Point(img.Width / 2, img.Height / 2), new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+				g.Flush();
+			}
+			return img;
+		}
+
+		public static int[] PlacePuzzels(int hort, int vert, double[] avgX, double[] avgY) //układanie puzzli po średnich punktach (keypoints)
 		{
 			//mały init :D
 			double[] copyavgX = (double[])avgX.Clone();
@@ -166,8 +182,6 @@ namespace Puzzle_Matcher
 			{
 				for (int j = 0; j < avgX.Length; j++)
 				{
-
-
 					if (avgX[i] == copyavgX[j])
 					{
 						tabX[i] = j;
@@ -188,7 +202,6 @@ namespace Puzzle_Matcher
 				}
 			}
 
-
 			if (hort >= vert)
 			{
 				int[] puzzelOrder = new int[(hort * vert)];
@@ -207,7 +220,6 @@ namespace Puzzle_Matcher
 					}
 				}
 
-
 				int counter = 0;
 				foreach (int[] block in blocks)
 				{
@@ -222,16 +234,12 @@ namespace Puzzle_Matcher
 							}
 						}
 					}
-
 				}
 
 				return puzzelOrder;
-
-
 			}
 			else
 			{
-
 				int[] puzzelOrder = new int[(hort * vert)];
 				List<int[]> blocks = new List<int[]>();
 
@@ -262,7 +270,6 @@ namespace Puzzle_Matcher
 							}
 						}
 					}
-
 				}
 
 				//zamiana na -> \|/ kolejność
@@ -271,7 +278,6 @@ namespace Puzzle_Matcher
 				int bigcounter = 1;
 				for (int i = 0; i < puzzelOrder.Length; i++)
 				{
-
 					puzzelOrder[i] = puzzelOrdercopy[counter];
 					counter += vert;
 					if (counter >= puzzelOrder.Length)
@@ -283,8 +289,6 @@ namespace Puzzle_Matcher
 
 				return puzzelOrder;
 			}
-
-
 		}
 
 		#endregion ExtensionMethods
