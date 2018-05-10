@@ -207,6 +207,9 @@ namespace Puzzle_Matcher
 			//#Puzzles in x-ayx, y-ax
 			var resultTab = ExtensionMethods.PlacePuzzels(X_ax, Y_ax, avgPuzellXPoints, avgPuzellYPoints);
 
+			Invoke(new Action(delegate { Progress(90, "Tworzenie obrazka końcowego."); }));
+			var fp = ExtensionMethods.generateFinalpicture(X_ax, Y_ax, resultTab, puzzels);
+
 			var finalword = "Puzzle należy ułożyć w kolejności:" + Environment.NewLine;
 			for (var i = 0; i < puzzelCounter; i++)
 			{
@@ -223,6 +226,8 @@ namespace Puzzle_Matcher
 
 			ExtensionMethods.ImageOut.Add(q1.ToBitmap());
 			ExtensionMethods.ImageOut.Add(solution);
+			ExtensionMethods.ImageOut.Add(fp.ToBitmap());
+
 			
 			Invoke(new Action(delegate { Progress(100, "DONE"); }));
 
