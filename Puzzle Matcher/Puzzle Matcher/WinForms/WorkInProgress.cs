@@ -193,7 +193,15 @@ namespace Puzzle_Matcher.WinForms
 
 		private static void StartNewStaThread()
 		{
-			Application.Run(new ResultWindow());
+			try
+			{
+				Application.Run(new ResultWindow());
+			}
+			catch(Exception ex)
+			{
+				// ignored
+			}
 		}
+	
 	}
 }
