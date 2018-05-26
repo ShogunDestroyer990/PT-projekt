@@ -73,6 +73,26 @@ namespace Puzzle_Matcher.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap ButtonLoadImageOrg {
+            get {
+                object obj = ResourceManager.GetObject("ButtonLoadImageOrg", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap ButtonPreviewImage {
+            get {
+                object obj = ResourceManager.GetObject("ButtonPreviewImage", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap ButtonProcessImage {
             get {
                 object obj = ResourceManager.GetObject("ButtonProcessImage", resourceCulture);
@@ -87,6 +107,15 @@ namespace Puzzle_Matcher.Properties {
             get {
                 object obj = ResourceManager.GetObject("Icon", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preview.
+        /// </summary>
+        internal static string PreviewWindowName {
+            get {
+                return ResourceManager.GetString("PreviewWindowName", resourceCulture);
             }
         }
     }
