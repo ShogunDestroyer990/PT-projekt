@@ -43,6 +43,8 @@ namespace Puzzle_Matcher.WinForms
 			this.prog = new System.Windows.Forms.NumericUpDown();
 			this.label3 = new System.Windows.Forms.Label();
 			this.Preview = new System.Windows.Forms.PictureBox();
+			this.MatchDistance = new System.Windows.Forms.NumericUpDown();
+			this.label4 = new System.Windows.Forms.Label();
 			((System.ComponentModel.ISupportInitialize)(this.ImageIn)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ProcessImage)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.OrginalImg)).BeginInit();
@@ -50,6 +52,7 @@ namespace Puzzle_Matcher.WinForms
 			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.prog)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.Preview)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.MatchDistance)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// ImageIn
@@ -103,7 +106,7 @@ namespace Puzzle_Matcher.WinForms
             0,
             0});
 			this.X_axis.Minimum = new decimal(new int[] {
-            2,
+            1,
             0,
             0,
             0});
@@ -143,7 +146,7 @@ namespace Puzzle_Matcher.WinForms
             0,
             0});
 			this.Y_axis.Minimum = new decimal(new int[] {
-            2,
+            1,
             0,
             0,
             0});
@@ -193,11 +196,45 @@ namespace Puzzle_Matcher.WinForms
 			this.Preview.TabStop = false;
 			this.Preview.Click += new System.EventHandler(this.Preview_Click);
 			// 
+			// MatchDistance
+			// 
+			this.MatchDistance.DecimalPlaces = 1;
+			this.MatchDistance.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.MatchDistance.Location = new System.Drawing.Point(575, 443);
+			this.MatchDistance.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			this.MatchDistance.Name = "MatchDistance";
+			this.MatchDistance.Size = new System.Drawing.Size(68, 20);
+			this.MatchDistance.TabIndex = 10;
+			this.MatchDistance.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+			// 
+			// label4
+			// 
+			this.label4.AutoSize = true;
+			this.label4.Location = new System.Drawing.Point(395, 445);
+			this.label4.Name = "label4";
+			this.label4.Size = new System.Drawing.Size(174, 13);
+			this.label4.TabIndex = 11;
+			this.label4.Text = "Minimalny dystans  (domyślnie: 0.1):";
+			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(784, 582);
+			this.Controls.Add(this.label4);
+			this.Controls.Add(this.MatchDistance);
 			this.Controls.Add(this.Preview);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.prog);
@@ -220,6 +257,7 @@ namespace Puzzle_Matcher.WinForms
 			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.prog)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.Preview)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.MatchDistance)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -238,6 +276,8 @@ namespace Puzzle_Matcher.WinForms
 		private NumericUpDown prog;
 		private Label label3;
 		private PictureBox Preview;
+		private NumericUpDown MatchDistance;
+		private Label label4;
 	}
 }
 

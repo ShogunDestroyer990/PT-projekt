@@ -4,24 +4,25 @@ using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.XFeatures2D;
+using Puzzle_Matcher.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 using System.Windows.Forms;
-using Puzzle_Matcher.Helpers;
 
 namespace Puzzle_Matcher.WinForms
 {
 	public partial class WorkInProgress : Form
 	{
-		public WorkInProgress(int xAx, int yAx, double prog)
+		public WorkInProgress(int xAx, int yAx, double prog, double matchDistance)
 		{
 			InitializeComponent();
 			XAx = xAx;
 			YAx = yAx;
 			Prog = prog;
+			MatchDistance = matchDistance;
 
 			Worker.RunWorkerAsync();
 		}
@@ -30,6 +31,8 @@ namespace Puzzle_Matcher.WinForms
 		private int YAx { get; }
 
 		private double Prog { get; }
+
+		private double MatchDistance { get; }
 
 		private void Progress(int progresPercent, string description = null)
 		{
@@ -114,7 +117,7 @@ namespace Puzzle_Matcher.WinForms
 
 					foreach (var match in arrayOfMatches)
 					{
-						if (!(match.Distance > 0.1)) continue; //IMPORTANT
+						if (!(match.Distance > MatchDistance)) continue;
 						x += orginalKeypoints[match.TrainIdx].Point.X;
 						y += orginalKeypoints[match.TrainIdx].Point.Y;
 						count++;
@@ -178,9 +181,9 @@ namespace Puzzle_Matcher.WinForms
 		{
 			var t = new Thread(StartNewStaThread)
 			{
-				#pragma warning disable 618
+#pragma warning disable 618
 				ApartmentState = ApartmentState.STA
-				#pragma warning restore 618
+#pragma warning restore 618
 			};
 
 			t.Start();
@@ -188,7 +191,7 @@ namespace Puzzle_Matcher.WinForms
 			Close();
 		}
 
-		private void StartNewStaThread()
+		private static void StartNewStaThread()
 		{
 			Application.Run(new ResultWindow());
 		}

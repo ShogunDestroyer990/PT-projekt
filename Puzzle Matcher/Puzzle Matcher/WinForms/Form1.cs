@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Puzzle_Matcher.Helpers;
 using Puzzle_Matcher.Properties;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Puzzle_Matcher.WinForms
 {
@@ -22,6 +22,8 @@ namespace Puzzle_Matcher.WinForms
 		{
 			InitializeComponent();
 		}
+
+		public bool IsFirstTime { get; set; } = true;
 
 		/// <summary>
 		///     Opens file dialog to choose image then saves that image.
@@ -37,16 +39,14 @@ namespace Puzzle_Matcher.WinForms
 
 			ExtensionMethods.ImagePath = ofd.FileName;
 
-			new Thread(() =>{Invoke(new Action(() =>{ImageIn.Image = ExtensionMethods.ResizeImage(new Bitmap(ExtensionMethods.ImagePath), ImageIn.Width, ImageIn.Height);}));}).Start();
-
-			new Thread(() =>{Invoke(new Action(PredictSizeOfPuzzles));}).Start();
+			new Thread(() => { Invoke(new Action(() => { ImageIn.Image = ExtensionMethods.ResizeImage(new Bitmap(ExtensionMethods.ImagePath), ImageIn.Width, ImageIn.Height); })); }).Start();
 
 			if (ExtensionMethods.ImagePath != null || ExtensionMethods.ImagePath != "") ProcessImage.Enabled = true;
 		}
 
 		private void PredictSizeOfPuzzles()
 		{
-			PreviewElement = CreatePreviewImage(ExtensionMethods.ImagePath, (double)prog.Value / 100);
+			if (PreviewElement == null) return;
 			X_axis.Value = Math.Floor((decimal)(PreviewElement.Item2 / 2.0));
 			Y_axis.Value = PreviewElement.Item2 / X_axis.Value;
 		}
@@ -63,9 +63,9 @@ namespace Puzzle_Matcher.WinForms
 
 			var t = new Thread(StartNewStaThread)
 			{
-				#pragma warning disable 618
+#pragma warning disable 618
 				ApartmentState = ApartmentState.STA
-				#pragma warning restore 618
+#pragma warning restore 618
 			};
 
 			t.Start();
@@ -75,7 +75,7 @@ namespace Puzzle_Matcher.WinForms
 
 		private void StartNewStaThread()
 		{
-			Application.Run(new WorkInProgress((int)X_axis.Value, (int)Y_axis.Value, ((double)prog.Value / 100)));
+			Application.Run(new WorkInProgress((int)X_axis.Value, (int)Y_axis.Value, ((double)prog.Value / 100), (double)MatchDistance.Value));
 		}
 
 		/// <summary>
@@ -99,7 +99,7 @@ namespace Puzzle_Matcher.WinForms
 
 		private void Preview_Click(object sender, EventArgs e)
 		{
-			if (ExtensionMethods.ImagePath == null || PreviewElement == null) return;
+			if (ExtensionMethods.ImagePath == null) return;
 
 			var preview = new Form
 			{
@@ -116,9 +116,16 @@ namespace Puzzle_Matcher.WinForms
 			image.TabStop = false;
 			image.InitialImage = null;
 
+			PreviewElement = CreatePreviewImage(ExtensionMethods.ImagePath, (double)prog.Value / 100);
+			if (IsFirstTime)
+			{
+				PredictSizeOfPuzzles();
+				IsFirstTime = false;
+			}
+
 			preview.Text = @"Preview - Puzzles find: " + PreviewElement.Item2;
+
 			image.Image = ExtensionMethods.ResizeImage(PreviewElement.Item1, 800, 600);
-			
 
 			preview.Controls.Add(image);
 			preview.Icon = Resources.Icon;
@@ -127,7 +134,6 @@ namespace Puzzle_Matcher.WinForms
 			preview.PerformLayout();
 
 			preview.Show();
-
 		}
 
 		private Tuple<Bitmap, int> PreviewElement { get; set; } = null;
