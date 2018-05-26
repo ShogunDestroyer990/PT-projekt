@@ -21,7 +21,7 @@ namespace Puzzle_Matcher
 			}
 			else
 			{
-				MessageBox.Show("Something went wrong.", "Error");
+				MessageBox.Show(@"Something went wrong.", @"Error");
 				Close();
 			}
 		}

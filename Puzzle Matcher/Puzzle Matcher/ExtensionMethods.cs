@@ -1,13 +1,15 @@
-﻿using System;
+﻿using Emgu.CV;
+using Emgu.CV.CvEnum;
+using Emgu.CV.Features2D;
+using Emgu.CV.Structure;
+using Emgu.CV.Util;
+using Emgu.CV.XFeatures2D;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using Emgu.CV;
-using Emgu.CV.CvEnum;
-using Emgu.CV.Structure;
-using Emgu.CV.Util;
-using Emgu.CV.XFeatures2D;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace Puzzle_Matcher
 {
@@ -108,13 +110,6 @@ namespace Puzzle_Matcher
 			return avg;
 		}
 
-		public static Image<Bgr, byte> MarkCountours(this Image<Bgr, byte> inImage, VectorOfVectorOfPoint contours, MCvScalar color, int index = -1, int thickness = 10)
-		{
-			var outImage = inImage.Copy();
-			CvInvoke.DrawContours(outImage, contours, index, color, thickness);
-			return outImage;
-		}
-
 		public static Image<Bgr, byte> PutText(this Image<Bgr, byte> inImage, string text, Point where, MCvScalar color, FontFace fontFace = FontFace.HersheySimplex, int fontScale = 10, int thickness = 2)
 		{
 			var outImage = inImage.Copy();
@@ -129,29 +124,7 @@ namespace Puzzle_Matcher
 			return outImage;
 		}
 
-		public static Image<Bgr, byte> FillPoly(this Image<Bgr, byte> inImage, VectorOfVectorOfPoint points, MCvScalar color, LineType lt = LineType.EightConnected, int shift = 0, Point offset = default(Point))
-		{
-			var outImage = inImage.Copy();
-			CvInvoke.FillPoly(outImage, points, color, lt, shift, offset);
-			return outImage;
-		}
-
-		public static UMat DetectAndCompute(this SURF s, Image<Bgr, byte> inImage, VectorOfKeyPoint keyPoints, IInputArray iia = null, bool useProvidedKeyPoints = true)
-		{
-			var descriptors = new UMat();
-			s.DetectAndCompute(inImage, iia, keyPoints, descriptors, useProvidedKeyPoints);
-			return descriptors;
-		}
-
-		public static Tuple<VectorOfKeyPoint, UMat> DetectAndCompute(this SURF s, Image<Bgr, byte> inImage, IInputArray iia = null, bool useProvidedKeyPoints = false)
-		{
-			var descriptors = new UMat();
-			var keyPoints = new VectorOfKeyPoint();
-			s.DetectAndCompute(inImage, iia, keyPoints, descriptors, useProvidedKeyPoints);
-			return new Tuple<VectorOfKeyPoint, UMat>(keyPoints, descriptors);
-		}
-
-		public static Image DrawSymbol(this Image img, string symbol, Brush backgroundBrush, Font font, Brush textBrush)
+		public static void DrawSymbol(this Image img, string symbol, Brush backgroundBrush, Font font, Brush textBrush)
 		{
 			using (var g = Graphics.FromImage(img))
 			{
@@ -162,44 +135,36 @@ namespace Puzzle_Matcher
 				g.DrawString(symbol, font, textBrush, new Point(img.Width / 2, img.Height / 2), new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
 				g.Flush();
 			}
-			return img;
 		}
 
-		public static Image<Bgr, byte> generateFinalpicture(int puzzelX, int puzzelY, int[] resultTab, List<Image<Bgr, byte>> puzzels)
-		{// puzzelX i Y przedstawiajają jak ma być ułożony obraz
-			int puzzelCounter = puzzelX * puzzelY;
-			int finalsumX = 0;
-			int finalsumY = 0;
-			bool mumIsFinalPicDone = false;
-			int picId = 0;
+		public static Image<Bgr, byte> GenerateFinalpicture(int puzzelX, int puzzelY, int[] resultTab, List<Image<Bgr, byte>> puzzels)
+		{
+			var puzzelCounter = puzzelX * puzzelY;
+			var finalsumX = 0;
+			var finalsumY = 0;
+			var mumIsFinalPicDone = false;
+			var picId = 0;
 
-			int puzzelXcounter = 0;
-			//nie chce mi się......
-			int avragepuzzelSize = 0;
-			foreach (Image<Bgr, byte> puzzel in puzzels)
+			var puzzelXcounter = 0;
+			var avragepuzzelSize = 0;
+
+			foreach (var puzzel in puzzels)
 			{
-
 				avragepuzzelSize += puzzel.Width;
 				avragepuzzelSize += puzzel.Height;
 			}
 
 			avragepuzzelSize /= (puzzelCounter * 2);
 
-
-
 			var finalPic = new Image<Bgr, byte>((avragepuzzelSize * puzzelX), (avragepuzzelSize * puzzelY));
-			int counterino = 0;
-
+			var counterino = 0;
 
 			while (mumIsFinalPicDone == false)
 			{
-				foreach (Image<Bgr, byte> puzzel in puzzels)
+				foreach (var puzzel in puzzels)
 				{
-
 					if (picId == resultTab[counterino])
 					{
-
-
 						if (puzzelX == puzzelXcounter)
 						{
 							puzzelXcounter = 0;
@@ -207,17 +172,14 @@ namespace Puzzle_Matcher
 							finalsumY += avragepuzzelSize;
 						}
 
-
 						finalPic.ROI = new Rectangle(finalsumX, finalsumY, avragepuzzelSize, avragepuzzelSize);
 
-						Image<Bgr, byte> resizedImage = puzzel.Resize(avragepuzzelSize, avragepuzzelSize, Inter.Linear);
+						var resizedImage = puzzel.Resize(avragepuzzelSize, avragepuzzelSize, Inter.Linear);
 
 						resizedImage.CopyTo(finalPic);
 
 						finalPic.ROI = System.Drawing.Rectangle.Empty;
 						finalsumX += avragepuzzelSize;
-
-
 					}
 					picId++;
 				}
@@ -231,280 +193,105 @@ namespace Puzzle_Matcher
 					picId = 0;
 					counterino++;
 					puzzelXcounter++;
-
 				}
 			}
 			return finalPic;
 		}
 
-		public static int[] PlacePuzzels(int hort, int vert, double[] avgX, double[] avgY) //układanie puzzli po średnich punktach (keypoints)
+		private static int[] PlacePuzzlesHelper(int e1, int e2, int[] ee1, int[] ee2)
 		{
-			//mały init :D
-			double[] copyavgX = (double[])avgX.Clone();
-			double[] copyavgY = (double[])avgY.Clone();
+			var puzzelOrder = new int[(e1 * e2)];
+			var blocks = new List<int[]>();
 
-			int[] tabX = new int[avgX.Length];
-			int[] tabY = new int[avgY.Length];
-
-			Array.Sort(avgX);
-
-			for (var i = 0; i < avgX.Length; i++)
+			for (var i = 0; i < (e1 * e2); i++)
 			{
-				for (var j = 0; j < avgX.Length; j++)
+				if (i % e1 != 0) continue;
+				var block = new int[e1];
+				for (var j = 0; j < e1; j++)
 				{
+					block[j] = ee1[i + j];
+				}
+				blocks.Add(block);
+			}
 
-
-					if (avgX[i] == copyavgX[j])
+			var counter = 0;
+			foreach (var block in blocks)
+			{
+				foreach (var tX in ee2)
+				{
+					foreach (var b in block)
 					{
-						tabX[i] = j;
+						if (b != tX) continue;
+						puzzelOrder[counter] = b;
+						counter++;
 					}
 				}
 			}
 
-			Array.Sort(avgY);
-
-			for (int i = 0; i < avgY.Length; i++)
-			{
-				for (int j = 0; j < avgY.Length; j++)
-				{
-					if (avgY[i] == copyavgY[j])
-					{
-						tabY[i] = j;
-					}
-				}
-			}
-
-
-			if (hort >= vert)
-			{
-				int[] puzzelOrder = new int[(hort * vert)];
-				List<int[]> blocks = new List<int[]>();
-
-				for (int i = 0; i < (hort * vert); i++)
-				{
-					if (i % hort == 0)
-					{
-						int[] block = new int[hort];
-						for (int j = 0; j < hort; j++)
-						{
-							block[j] = tabY[i + j];
-						}
-						blocks.Add(block);
-					}
-				}
-
-
-				int counter = 0;
-				foreach (int[] block in blocks)
-				{
-					for (int j = 0; j < tabX.Length; j++)
-					{
-						for (int i = 0; i < block.Length; i++)
-						{
-							if (block[i] == tabX[j])
-							{
-								puzzelOrder[counter] = block[i];
-								counter++;
-							}
-						}
-					}
-
-				}
-
-				return puzzelOrder;
-
-
-			}
-			else
-			{
-
-				int[] puzzelOrder = new int[(hort * vert)];
-				List<int[]> blocks = new List<int[]>();
-
-				for (int i = 0; i < (hort * vert); i++)
-				{
-					if (i % vert == 0)
-					{
-						int[] block = new int[vert];
-						for (int j = 0; j < vert; j++)
-						{
-							block[j] = tabX[i + j];
-						}
-						blocks.Add(block);
-					}
-				}
-
-				int counter = 0;
-				foreach (int[] block in blocks)
-				{
-					for (int j = 0; j < tabY.Length; j++)
-					{
-						for (int i = 0; i < block.Length; i++)
-						{
-							if (block[i] == tabY[j])
-							{
-								puzzelOrder[counter] = block[i];
-								counter++;
-							}
-						}
-					}
-
-				}
-
-				//zamiana na -> \|/ kolejność
-				int[] puzzelOrdercopy = (int[])puzzelOrder.Clone();
-				counter = 0;
-				int bigcounter = 1;
-				for (int i = 0; i < puzzelOrder.Length; i++)
-				{
-
-					puzzelOrder[i] = puzzelOrdercopy[counter];
-					counter += vert;
-					if (counter >= puzzelOrder.Length)
-					{
-						counter = bigcounter;
-						bigcounter++;
-					}
-				}
-
-				return puzzelOrder;
-			}
-
-
+			return puzzelOrder;
 		}
 
-		public static int[] assumePuzzelConfiguration(double[] avgPuzellXPoints, double[] avgPuzellYPoints, int puzzelCounter)
+		private static int[] SortedArray(double[] a)
 		{
-			//dużo pętel
-			//nie chce mi sie
-			//ale działa
-			double akumX = 0;
-			double akumY = 0;
+			var copyOfA = (double[]) a.Clone();
+			var tab = new int[a.Length];
+			Array.Sort(a);
 
-			int[] options = new int[puzzelCounter]; //tablica zawsze będzie za duża :\
-			int cunt = 0;
-
-			for (int i = 1; i <= puzzelCounter; i++)
+			for(var i = 0; i < a.Length; i++)
 			{
-				if (puzzelCounter % i == 0)
+				for(var j = 0; j < a.Length; j++)
 				{
-					options[cunt] = i;
-					cunt++;
+					if(a[i] == copyOfA[j]) tab[i] = j;
 				}
 			}
 
-
-			for (int i = 0; i < puzzelCounter; i++)
-			{
-				akumX += avgPuzellXPoints[i];
-				akumY += avgPuzellYPoints[i];
-
-
-			} //liczenie średniej
-
-			akumX /= puzzelCounter;
-			akumY /= puzzelCounter;
-			int scoreX = 0;
-			int scoreY = 0;
-			cunt = 0;
-			for (int i = 0; i < puzzelCounter; i++)
-			{
-				if ((akumX * 1.02) > avgPuzellXPoints[i] && (akumX * 0.98) < avgPuzellXPoints[i])  //ahh nie mam pomysłów
-				{
-					scoreX++;
-				}
-
-				if ((akumY * 1.02) > avgPuzellYPoints[i] && (akumY * 0.98) < avgPuzellYPoints[i])
-				{
-					scoreY++;
-				}
-
-				if (options[i] != 0)
-				{
-					cunt++;
-				}
-			}//liczenie wyniku
-
-			int[] difrenceX = new int[cunt];
-			int[] difrenceY = new int[cunt];
-
-			bool waitfordecisionX = false;
-
-			bool waitfordecisionY = false;
-
-			int minimumX = puzzelCounter;
-			int minimumY = puzzelCounter;
-
-			int[] decision = new int[2]; //0 -> X  1->Y
-
-
-			for (int i = 0; i < cunt; i++)
-			{
-				difrenceX[i] = Math.Abs(options[i] - scoreX);
-				difrenceY[i] = Math.Abs(options[i] - scoreY);
-
-				if (difrenceX[i] == minimumX)
-				{
-					waitfordecisionX = true;
-				}
-
-				if (difrenceY[i] == minimumY)
-				{
-					waitfordecisionY = true;
-				}
-
-				if (difrenceX[i] < minimumX)
-				{
-					minimumX = difrenceX[i];
-					waitfordecisionX = false;
-					decision[0] = options[i];
-				}
-
-				if (difrenceY[i] < minimumY)
-				{
-					minimumY = difrenceY[i];
-					waitfordecisionY = false;
-					decision[1] = options[i];
-				}
-
-
-				// CvInvoke.PutText(k1, difrenceX[i].ToString(), new Point(100, 1800 + (100 * i)), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
-				// CvInvoke.PutText(k1, difrenceY[i].ToString(), new Point(1500, 1800 + (100 * i)), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
-
-			}//im bliżej zera tym lepiej zliczanie różnicy
-
-			/* */
-
-			if (waitfordecisionX == true)
-			{
-				for (int i = 0; i < cunt; i++)
-				{
-					if (decision[1] == options[i])
-					{
-						decision[0] = options[cunt - 1 - i];
-					}
-				}
-
-			}
-
-			if (waitfordecisionY == true)
-			{
-				for (int i = 0; i < cunt; i++)
-				{
-					if (decision[1] == options[i])
-					{
-						decision[0] = options[cunt - 1 - i];
-					}
-				}
-
-			}
-			//jeśli się powtarzazły to wybieramy odwrotność
-			//to pewnie nie będzie działać za często
-			//przyda się opcja w menu żeby urzytkownik wybrał czy chce tego używać czy nie
-
-			return decision;
+			return tab;
 		}
 
+		public static int[] PlacePuzzels(int hort, int vert, double[] avgX, double[] avgY)
+		{
+			var tabX = SortedArray(avgX);
+			var tabY = SortedArray(avgY);
+			
+			if (hort >= vert) return PlacePuzzlesHelper(hort, vert, tabY, tabX);
+
+			var puzzelOrder = PlacePuzzlesHelper(vert, hort, tabX, tabY);
+
+			//zamiana na -> \|/ kolejność
+			var puzzelOrdercopy = (int[])puzzelOrder.Clone();
+			var counter = 0;
+			var bigcounter = 1;
+			for (var i = 0; i < puzzelOrder.Length; i++)
+			{
+				puzzelOrder[i] = puzzelOrdercopy[counter];
+				counter += vert;
+				if (counter < puzzelOrder.Length) continue;
+				counter = bigcounter;
+				bigcounter++;
+			}
+
+			return puzzelOrder;
+		}
+
+		public static VectorOfVectorOfDMatch KnnMatch(this BFMatcher matcher, UMat pdesc, int i, IInputArray o = null)
+		{
+			var puzzelmatches = new VectorOfVectorOfDMatch();
+			matcher.KnnMatch(pdesc, puzzelmatches, i, o);
+			return puzzelmatches;
+		}
+
+		public static Tuple<UMat, VectorOfKeyPoint> DetectAndCompute(SURF surf, Image<Bgr, byte> image, bool b, IInputArray inputArray = null)
+		{
+			var keypoints = new VectorOfKeyPoint();
+			var desc = new UMat();
+			surf.DetectAndCompute(image, inputArray, keypoints, desc, b);
+			return new Tuple<UMat, VectorOfKeyPoint>(desc, keypoints);
+		}
+
+		public static UMat DetectAndCompute(this SURF surf, Image<Bgr, byte> image)
+		{
+			return DetectAndCompute(surf, image, false).Item1;
+		}
 
 		#endregion ExtensionMethods
 	}
