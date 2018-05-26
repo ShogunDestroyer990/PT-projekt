@@ -9,9 +9,8 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices.ComTypes;
 
-namespace Puzzle_Matcher
+namespace Puzzle_Matcher.Helpers
 {
 	public static class ExtensionMethods
 	{
@@ -51,23 +50,14 @@ namespace Puzzle_Matcher
 			return destImage;
 		}
 
-		public static Image<Gray, byte> GaussBlur
-			(this Image<Gray, byte> inImage, Size ksize = new Size(), double sigmaX = 5, double sigmaY = 5)
+		public static Image<Gray, byte> GaussBlur(this Image<Gray, byte> inImage, Size ksize = new Size(), double sigmaX = 5, double sigmaY = 5)
 		{
 			var outImage = inImage.Copy();
 			CvInvoke.GaussianBlur(inImage, outImage, ksize, sigmaX, sigmaY);
 			return outImage;
 		}
 
-		public static Image<Gray, byte> AdaptiveThreshold
-		(
-			this Image<Gray, byte> inImage
-			, double maxVal = 250
-			, AdaptiveThresholdType adaptiveThresholdType = AdaptiveThresholdType.MeanC
-			, ThresholdType thresholdType = ThresholdType.BinaryInv
-			, int blockSize = 39
-			, double param1 = 4
-		)
+		public static Image<Gray, byte> AdaptiveThreshold(this Image<Gray, byte> inImage, double maxVal = 250, AdaptiveThresholdType adaptiveThresholdType = AdaptiveThresholdType.MeanC, ThresholdType thresholdType = ThresholdType.BinaryInv, int blockSize = 39, double param1 = 4)
 		{
 			var outImage = inImage.Copy();
 			CvInvoke.AdaptiveThreshold(GaussBlur(inImage), outImage, maxVal, adaptiveThresholdType, thresholdType, blockSize, param1);
@@ -233,15 +223,15 @@ namespace Puzzle_Matcher
 
 		private static int[] SortedArray(double[] a)
 		{
-			var copyOfA = (double[]) a.Clone();
+			var copyOfA = (double[])a.Clone();
 			var tab = new int[a.Length];
 			Array.Sort(a);
 
-			for(var i = 0; i < a.Length; i++)
+			for (var i = 0; i < a.Length; i++)
 			{
-				for(var j = 0; j < a.Length; j++)
+				for (var j = 0; j < a.Length; j++)
 				{
-					if(a[i] == copyOfA[j]) tab[i] = j;
+					if (a[i] == copyOfA[j]) tab[i] = j;
 				}
 			}
 
@@ -252,7 +242,7 @@ namespace Puzzle_Matcher
 		{
 			var tabX = SortedArray(avgX);
 			var tabY = SortedArray(avgY);
-			
+
 			if (hort >= vert) return PlacePuzzlesHelper(hort, vert, tabY, tabX);
 
 			var puzzelOrder = PlacePuzzlesHelper(vert, hort, tabX, tabY);

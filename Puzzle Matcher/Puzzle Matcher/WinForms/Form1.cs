@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Runtime.Remoting.Messaging;
 using System.Threading;
 using System.Windows.Forms;
 using Emgu.CV;
 using Emgu.CV.CvEnum;
-using Emgu.CV.Face;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
+using Puzzle_Matcher.Helpers;
 using Puzzle_Matcher.Properties;
 
-namespace Puzzle_Matcher
+namespace Puzzle_Matcher.WinForms
 {
 	public partial class MainWindow : Form
 	{
@@ -40,7 +39,7 @@ namespace Puzzle_Matcher
 
 			new Thread(() =>{Invoke(new Action(() =>{ImageIn.Image = ExtensionMethods.ResizeImage(new Bitmap(ExtensionMethods.ImagePath), ImageIn.Width, ImageIn.Height);}));}).Start();
 
-			//new Thread(() =>{Invoke(new Action(PredictSizeOfPuzzles));}).Start();
+			new Thread(() =>{Invoke(new Action(PredictSizeOfPuzzles));}).Start();
 
 			if (ExtensionMethods.ImagePath != null || ExtensionMethods.ImagePath != "") ProcessImage.Enabled = true;
 		}
@@ -48,7 +47,7 @@ namespace Puzzle_Matcher
 		private void PredictSizeOfPuzzles()
 		{
 			PreviewElement = CreatePreviewImage(ExtensionMethods.ImagePath, (double)prog.Value / 100);
-			X_axis.Value = Math.Floor((decimal)(PreviewElement.Item2 / 2));
+			X_axis.Value = Math.Floor((decimal)(PreviewElement.Item2 / 2.0));
 			Y_axis.Value = PreviewElement.Item2 / X_axis.Value;
 		}
 
@@ -61,9 +60,22 @@ namespace Puzzle_Matcher
 		private void ProcessImage_Click(object sender, EventArgs e)
 		{
 			if (ExtensionMethods.ImagePath == null || ExtensionMethods.OrginalImagePath == null) return;
-			new Thread(() => { Application.Run(new WorkInProgress((int)X_axis.Value, (int)Y_axis.Value, ((double)prog.Value / 100))); }).Start();
+
+			var t = new Thread(StartNewStaThread)
+			{
+				#pragma warning disable 618
+				ApartmentState = ApartmentState.STA
+				#pragma warning restore 618
+			};
+
+			t.Start();
 
 			Close();
+		}
+
+		private void StartNewStaThread()
+		{
+			Application.Run(new WorkInProgress((int)X_axis.Value, (int)Y_axis.Value, ((double)prog.Value / 100)));
 		}
 
 		/// <summary>

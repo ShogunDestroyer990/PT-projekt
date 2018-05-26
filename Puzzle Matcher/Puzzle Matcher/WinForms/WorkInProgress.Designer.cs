@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace Puzzle_Matcher
+namespace Puzzle_Matcher.WinForms
 {
 	partial class WorkInProgress
 	{

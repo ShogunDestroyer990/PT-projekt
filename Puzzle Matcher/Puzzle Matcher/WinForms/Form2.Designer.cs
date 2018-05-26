@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
 
-namespace Puzzle_Matcher
+namespace Puzzle_Matcher.WinForms
 {
 	partial class ResultWindow
 	{
@@ -33,6 +33,7 @@ namespace Puzzle_Matcher
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ResultWindow));
 			this.ImageOut = new System.Windows.Forms.PictureBox();
+			this.SaveToFolder = new System.Windows.Forms.Button();
 			((System.ComponentModel.ISupportInitialize)(this.ImageOut)).BeginInit();
 			this.SuspendLayout();
 			// 
@@ -45,11 +46,22 @@ namespace Puzzle_Matcher
 			this.ImageOut.TabStop = false;
 			this.ImageOut.Click += new System.EventHandler(this.ImageOut_Click);
 			// 
+			// SaveToFolder
+			// 
+			this.SaveToFolder.Location = new System.Drawing.Point(13, 557);
+			this.SaveToFolder.Name = "SaveToFolder";
+			this.SaveToFolder.Size = new System.Drawing.Size(759, 62);
+			this.SaveToFolder.TabIndex = 1;
+			this.SaveToFolder.Text = "Zapisz wszystko do folderu ...";
+			this.SaveToFolder.UseVisualStyleBackColor = true;
+			this.SaveToFolder.Click += new System.EventHandler(this.SaveToFolder_Click);
+			// 
 			// ResultWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(784, 562);
+			this.ClientSize = new System.Drawing.Size(784, 622);
+			this.Controls.Add(this.SaveToFolder);
 			this.Controls.Add(this.ImageOut);
 			this.HelpButton = true;
 			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -63,5 +75,6 @@ namespace Puzzle_Matcher
 		#endregion
 
 		private PictureBox ImageOut;
+		private Button SaveToFolder;
 	}
 }

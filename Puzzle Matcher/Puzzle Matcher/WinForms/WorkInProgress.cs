@@ -8,26 +8,26 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using Puzzle_Matcher.Helpers;
 
-namespace Puzzle_Matcher
+namespace Puzzle_Matcher.WinForms
 {
 	public partial class WorkInProgress : Form
 	{
-		public WorkInProgress(int x_ax, int y_ax, double prog)
+		public WorkInProgress(int xAx, int yAx, double prog)
 		{
 			InitializeComponent();
-			X_ax = x_ax;
-			Y_ax = y_ax;
+			XAx = xAx;
+			YAx = yAx;
 			Prog = prog;
 
 			Worker.RunWorkerAsync();
 		}
 
-		private int X_ax { get; }
-		private int Y_ax { get; }
+		private int XAx { get; }
+		private int YAx { get; }
 
 		private double Prog { get; }
 
@@ -54,7 +54,6 @@ namespace Puzzle_Matcher
 			for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
 			var boundRect = new List<Rectangle>();
 			for (var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
-			
 
 			var puzzels = new List<Image<Bgr, byte>>();
 
@@ -71,16 +70,15 @@ namespace Puzzle_Matcher
 
 				q1 = q1.Rectangle(r, new MCvScalar(255, 0, 255));
 				q1 = q1.PutText(puzzleCount.ToString(), new Point(r.X + r.Width / 2, r.Y + r.Height / 2), new MCvScalar(255, 0, 255), FontFace.HersheySimplex, 10, 20);
-
 			}
 
-			#endregion
+			#endregion Indentyfikacja puzzli
 
 			#region Cechy wspólne
 
 			Invoke(new Action(delegate { Progress(66, "Detekcja cech wspólnych."); }));
 			var surf = new SURF(920);
-			var puzzelCounter = puzzels.Count();
+			var puzzelCounter = puzzels.Count;
 			var avgPuzellXPoints = new double[puzzelCounter];
 			var avgPuzellYPoints = new double[puzzelCounter];
 			puzzelCounter = 0;
@@ -92,7 +90,7 @@ namespace Puzzle_Matcher
 			var odesc = orginalFeatures.Item1;
 			var orginalKeypoints = orginalFeatures.Item2;
 
-			#endregion
+			#endregion Cechy wspólne
 
 			#region Dopasowanie
 
@@ -131,17 +129,16 @@ namespace Puzzle_Matcher
 				puzzelCounter++;
 			}
 
-
-			#endregion
+			#endregion Dopasowanie
 
 			#region Układanie puzzli
 
 			Invoke(new Action(delegate { Progress(90, "Układanie puzzli w właściwej kolejnoścu."); }));
 
-			var resultTab = ExtensionMethods.PlacePuzzels(X_ax, Y_ax, avgPuzellXPoints, avgPuzellYPoints);
+			var resultTab = ExtensionMethods.PlacePuzzels(XAx, YAx, avgPuzellXPoints, avgPuzellYPoints);
 
 			Invoke(new Action(delegate { Progress(90, "Tworzenie obrazka końcowego."); }));
-			var fp = ExtensionMethods.GenerateFinalpicture(X_ax, Y_ax, resultTab, puzzels);
+			var fp = ExtensionMethods.GenerateFinalpicture(XAx, YAx, resultTab, puzzels);
 
 			var finalword = "Puzzle należy ułożyć w kolejności:" + Environment.NewLine;
 			for (var i = 0; i < puzzelCounter; i++)
@@ -149,14 +146,15 @@ namespace Puzzle_Matcher
 				resultTab[i]++; //przetwarzając przetwarzałem od zera a puzzle są od 1 ..więc
 				finalword += resultTab[i];
 				finalword += " ";
-				if (i != 0 && ((i+1) % (X_ax)) == 0) finalword += Environment.NewLine;
+				if (i != 0 && ((i + 1) % (XAx)) == 0) finalword += Environment.NewLine;
 			}
 
 			var solution = new Bitmap(q1.Width / 2, q1.Height / 2);
 			solution.DrawSymbol(finalword, new SolidBrush(Color.Gray), new Font(FontFamily.GenericSerif, 40), new SolidBrush(Color.Black));
 
-			#endregion
+			#endregion Układanie puzzli
 
+			#region Zapisywanie
 
 			Invoke(new Action(delegate { Progress(99, "Zapisywanie postępów."); }));
 
@@ -167,6 +165,8 @@ namespace Puzzle_Matcher
 			Invoke(new Action(delegate { Progress(100, "DONE"); }));
 
 			Thread.Sleep(100);
+
+			#endregion Zapisywanie
 		}
 
 		private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -176,9 +176,21 @@ namespace Puzzle_Matcher
 
 		private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
 		{
-			new Thread(() => { Application.Run(new ResultWindow()); }).Start();
+			var t = new Thread(StartNewStaThread)
+			{
+				#pragma warning disable 618
+				ApartmentState = ApartmentState.STA
+				#pragma warning restore 618
+			};
+
+			t.Start();
 
 			Close();
+		}
+
+		private void StartNewStaThread()
+		{
+			Application.Run(new ResultWindow());
 		}
 	}
 }
