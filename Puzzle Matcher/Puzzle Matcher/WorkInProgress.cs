@@ -50,7 +50,7 @@ namespace Puzzle_Matcher
 			var e4 = new VectorOfVectorOfPoint();
 			for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
 
-			var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
+			//var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
 
 			var boundRect = new List<Rectangle>();
 
@@ -63,13 +63,13 @@ namespace Puzzle_Matcher
 			foreach (var r in boundRect)
 			{
 				x++;
-				var img = q5.Copy();
+				var img = q1.Copy();
 				img.ROI = r;
 				puzzels.Add(img.Copy());
-				CvInvoke.Rectangle(q5, r, new MCvScalar(250, 0, 250), 10);
+				CvInvoke.Rectangle(q1, r, new MCvScalar(250, 0, 250), 10);
 				CvInvoke.PutText
 				(
-					q5
+					q1
 					, x.ToString()
 					, new Point(r.X + r.Width / 2, r.Y + r.Height / 2)
 					, FontFace.HersheySimplex

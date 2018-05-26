@@ -82,7 +82,6 @@ namespace Puzzle_Matcher
 			var preview = new Form
 			{
 				ClientSize = new Size(815, 615),
-				Text = Resources.PreviewWindowName,
 			};
 
 			var image = new PictureBox();
@@ -99,39 +98,30 @@ namespace Puzzle_Matcher
 
 			var q1 = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
 
-			var w3 = ExtensionMethods.FindContours(q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate().Erode());
+			var w3 = ExtensionMethods.FindContours(q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate(8).Erode());
 
-			var avg = ExtensionMethods.CalculateAvreage(w3.Item1, (double)prog.Value);
+			var avg = ExtensionMethods.CalculateAvreage(w3.Item1, (double)prog.Value/100);
+
 			var e4 = new VectorOfVectorOfPoint();
 			for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
-
-			var q5 = q1.Copy().PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
 
 			var boundRect = new List<Rectangle>();
 
 			for (var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
-			var x = 0;
+
+			var puzzelCounter = 0;
 
 			foreach (var r in boundRect)
 			{
-				x++;
-				var img = q5.Copy();
-				img.ROI = r;
-				CvInvoke.Rectangle(q5, r, new MCvScalar(255, 0, 255), 10);
-				CvInvoke.PutText
-				(
-					q5
-					, x.ToString()
-					, new Point(r.X + r.Width / 2, r.Y + r.Height / 2)
-					, FontFace.HersheySimplex
-					, 8
-					, new MCvScalar(255, 0, 255)
-					, 10);
+				puzzelCounter++;
+				q1 = q1.Rectangle(r, new MCvScalar(250, 0, 250)).PutText(puzzelCounter.ToString(), new Point(r.X + r.Width / 2, r.Y + r.Height / 2), new MCvScalar(255, 0, 255), FontFace.HersheySimplex, 10, 20);
 			}
 
+
 			#endregion
-			
-			image.Image = ExtensionMethods.ResizeImage(q5.ToBitmap(), 800, 600);
+
+			preview.Text = @"Preview - Puzzles find: " + puzzelCounter;
+			image.Image = ExtensionMethods.ResizeImage(q1.ToBitmap(), 800, 600);
 			
 
 			preview.Controls.Add(image);

@@ -10,7 +10,6 @@ C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\x86\opencv
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\x86\vcruntime140.dll
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Puzzle Matcher.exe.config
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Puzzle Matcher.exe
-C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Puzzle Matcher.pdb
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Emgu.CV.UI.dll
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Emgu.CV.World.dll
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\ZedGraph.dll
@@ -38,4 +37,4 @@ C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Mat
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csproj.CoreCompileInputs.cache
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.exe
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.pdb
-C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csprojResolveAssemblyReference.cache
+C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Puzzle Matcher.pdb
