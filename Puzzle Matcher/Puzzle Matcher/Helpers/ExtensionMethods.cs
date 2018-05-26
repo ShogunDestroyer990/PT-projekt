@@ -283,6 +283,138 @@ namespace Puzzle_Matcher.Helpers
 			return DetectAndCompute(surf, image, false).Item1;
 		}
 
+		public static int[] assumePuzzelConfiguration(double[] avgPuzellXPoints, double[] avgPuzellYPoints, int puzzelCounter)
+		{
+			//dużo pętel
+			//nie chce mi sie
+			//ale działa
+			double akumX = 0;
+			double akumY = 0;
+
+			int[] options = new int[puzzelCounter]; //tablica zawsze będzie za duża :\
+			int cunt = 0;
+
+			for (int i = 1; i <= puzzelCounter; i++)
+			{
+				if (puzzelCounter % i == 0)
+				{
+					options[cunt] = i;
+					cunt++;
+				}
+			}
+
+
+			for (int i = 0; i < puzzelCounter; i++)
+			{
+				akumX += avgPuzellXPoints[i];
+				akumY += avgPuzellYPoints[i];
+
+
+			} //liczenie średniej
+
+			akumX /= puzzelCounter;
+			akumY /= puzzelCounter;
+			int scoreX = 0;
+			int scoreY = 0;
+			cunt = 0;
+			for (int i = 0; i < puzzelCounter; i++)
+			{
+				if ((akumX * 1.02) > avgPuzellXPoints[i] && (akumX * 0.98) < avgPuzellXPoints[i])  //ahh nie mam pomysłów
+				{
+					scoreX++;
+				}
+
+				if ((akumY * 1.02) > avgPuzellYPoints[i] && (akumY * 0.98) < avgPuzellYPoints[i])
+				{
+					scoreY++;
+				}
+
+				if (options[i] != 0)
+				{
+					cunt++;
+				}
+			}//liczenie wyniku
+
+			int[] difrenceX = new int[cunt];
+			int[] difrenceY = new int[cunt];
+
+			bool waitfordecisionX = false;
+
+			bool waitfordecisionY = false;
+
+			int minimumX = puzzelCounter;
+			int minimumY = puzzelCounter;
+
+			int[] decision = new int[2]; //0 -> X  1->Y
+
+
+			for (int i = 0; i < cunt; i++)
+			{
+				difrenceX[i] = Math.Abs(options[i] - scoreX);
+				difrenceY[i] = Math.Abs(options[i] - scoreY);
+
+				if (difrenceX[i] == minimumX)
+				{
+					waitfordecisionX = true;
+				}
+
+				if (difrenceY[i] == minimumY)
+				{
+					waitfordecisionY = true;
+				}
+
+				if (difrenceX[i] < minimumX)
+				{
+					minimumX = difrenceX[i];
+					waitfordecisionX = false;
+					decision[0] = options[i];
+				}
+
+				if (difrenceY[i] < minimumY)
+				{
+					minimumY = difrenceY[i];
+					waitfordecisionY = false;
+					decision[1] = options[i];
+				}
+
+
+				// CvInvoke.PutText(k1, difrenceX[i].ToString(), new Point(100, 1800 + (100 * i)), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
+				// CvInvoke.PutText(k1, difrenceY[i].ToString(), new Point(1500, 1800 + (100 * i)), FontFace.HersheySimplex, 4, new MCvScalar(255, 0, 255), 4);
+
+			}//im bliżej zera tym lepiej zliczanie różnicy
+
+			/* */
+
+			if (waitfordecisionX == true)
+			{
+				for (int i = 0; i < cunt; i++)
+				{
+					if (decision[1] == options[i])
+					{
+						decision[0] = options[cunt - 1 - i];
+					}
+				}
+
+			}
+
+			if (waitfordecisionY == true)
+			{
+				for (int i = 0; i < cunt; i++)
+				{
+					if (decision[1] == options[i])
+					{
+						decision[0] = options[cunt - 1 - i];
+					}
+				}
+
+			}
+			//jeśli się powtarzazły to wybieramy odwrotność
+			//to pewnie nie będzie działać za często
+			//przyda się opcja w menu żeby urzytkownik wybrał czy chce tego używać czy nie
+
+			return decision;
+		}
+
 		#endregion ExtensionMethods
 	}
 }
