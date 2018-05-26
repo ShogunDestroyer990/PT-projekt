@@ -42,12 +42,14 @@ namespace Puzzle_Matcher
 			this.Y_axis = new System.Windows.Forms.NumericUpDown();
 			this.prog = new System.Windows.Forms.NumericUpDown();
 			this.label3 = new System.Windows.Forms.Label();
+			this.Preview = new System.Windows.Forms.PictureBox();
 			((System.ComponentModel.ISupportInitialize)(this.ImageIn)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.ProcessImage)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.OrginalImg)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.X_axis)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).BeginInit();
 			((System.ComponentModel.ISupportInitialize)(this.prog)).BeginInit();
+			((System.ComponentModel.ISupportInitialize)(this.Preview)).BeginInit();
 			this.SuspendLayout();
 			// 
 			// ImageIn
@@ -66,7 +68,7 @@ namespace Puzzle_Matcher
 			this.ProcessImage.Enabled = false;
 			this.ProcessImage.Image = global::Puzzle_Matcher.Properties.Resources.ButtonProcessImage;
 			this.ProcessImage.InitialImage = null;
-			this.ProcessImage.Location = new System.Drawing.Point(12, 444);
+			this.ProcessImage.Location = new System.Drawing.Point(12, 469);
 			this.ProcessImage.Name = "ProcessImage";
 			this.ProcessImage.Size = new System.Drawing.Size(760, 100);
 			this.ProcessImage.TabIndex = 1;
@@ -83,7 +85,7 @@ namespace Puzzle_Matcher
 			// 
 			// OrginalImg
 			// 
-			this.OrginalImg.Image = global::Puzzle_Matcher.Properties.Resources.ButtonLoadImage;
+			this.OrginalImg.Image = global::Puzzle_Matcher.Properties.Resources.ButtonLoadImageOrg;
 			this.OrginalImg.InitialImage = null;
 			this.OrginalImg.Location = new System.Drawing.Point(396, 12);
 			this.OrginalImg.Name = "OrginalImg";
@@ -126,7 +128,7 @@ namespace Puzzle_Matcher
 			// label2
 			// 
 			this.label2.AutoSize = true;
-			this.label2.Location = new System.Drawing.Point(234, 419);
+			this.label2.Location = new System.Drawing.Point(13, 445);
 			this.label2.Name = "label2";
 			this.label2.Size = new System.Drawing.Size(103, 13);
 			this.label2.TabIndex = 6;
@@ -134,7 +136,7 @@ namespace Puzzle_Matcher
 			// 
 			// Y_axis
 			// 
-			this.Y_axis.Location = new System.Drawing.Point(343, 417);
+			this.Y_axis.Location = new System.Drawing.Point(135, 443);
 			this.Y_axis.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -156,14 +158,9 @@ namespace Puzzle_Matcher
 			// 
 			// prog
 			// 
-			this.prog.Location = new System.Drawing.Point(579, 418);
+			this.prog.Location = new System.Drawing.Point(575, 417);
 			this.prog.Maximum = new decimal(new int[] {
-            10000,
-            0,
-            0,
-            0});
-			this.prog.Minimum = new decimal(new int[] {
-            1,
+            1000,
             0,
             0,
             0});
@@ -171,7 +168,7 @@ namespace Puzzle_Matcher
 			this.prog.Size = new System.Drawing.Size(68, 20);
 			this.prog.TabIndex = 7;
 			this.prog.Value = new decimal(new int[] {
-            920,
+            85,
             0,
             0,
             0});
@@ -181,15 +178,27 @@ namespace Puzzle_Matcher
 			this.label3.AutoSize = true;
 			this.label3.Location = new System.Drawing.Point(395, 420);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(178, 13);
+			this.label3.Size = new System.Drawing.Size(174, 13);
 			this.label3.TabIndex = 8;
-			this.label3.Text = "Wielkość konturów (domyślne: 920):";
+			this.label3.Text = "Wielkość konturów (domyślnie: 85):";
+			// 
+			// Preview
+			// 
+			this.Preview.Image = global::Puzzle_Matcher.Properties.Resources.ButtonPreviewImage;
+			this.Preview.InitialImage = global::Puzzle_Matcher.Properties.Resources.ButtonPreviewImage;
+			this.Preview.Location = new System.Drawing.Point(650, 416);
+			this.Preview.Name = "Preview";
+			this.Preview.Size = new System.Drawing.Size(122, 21);
+			this.Preview.TabIndex = 9;
+			this.Preview.TabStop = false;
+			this.Preview.Click += new System.EventHandler(this.Preview_Click);
 			// 
 			// MainWindow
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(784, 562);
+			this.ClientSize = new System.Drawing.Size(784, 582);
+			this.Controls.Add(this.Preview);
 			this.Controls.Add(this.label3);
 			this.Controls.Add(this.prog);
 			this.Controls.Add(this.label2);
@@ -210,6 +219,7 @@ namespace Puzzle_Matcher
 			((System.ComponentModel.ISupportInitialize)(this.X_axis)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.Y_axis)).EndInit();
 			((System.ComponentModel.ISupportInitialize)(this.prog)).EndInit();
+			((System.ComponentModel.ISupportInitialize)(this.Preview)).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -227,6 +237,7 @@ namespace Puzzle_Matcher
 		private NumericUpDown Y_axis;
 		private NumericUpDown prog;
 		private Label label3;
+		private PictureBox Preview;
 	}
 }
 

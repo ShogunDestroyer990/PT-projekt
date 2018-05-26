@@ -1,31 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
-using Emgu.CV;
+﻿using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.XFeatures2D;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Threading;
+using System.Windows.Forms;
 
 namespace Puzzle_Matcher
 {
 	public partial class WorkInProgress : Form
 	{
-		public WorkInProgress(int x_ax, int y_ax)
+		public WorkInProgress(int x_ax, int y_ax, double prog)
 		{
 			InitializeComponent();
 			X_ax = x_ax;
 			Y_ax = y_ax;
+			Prog = prog;
 
 			Worker.RunWorkerAsync();
 		}
 
 		private int X_ax { get; }
 		private int Y_ax { get; }
+
+		private double Prog { get; }
 
 		private void Progress(int progresPercent, string description = null)
 		{
@@ -43,11 +46,11 @@ namespace Puzzle_Matcher
 			Invoke(new Action(delegate { Progress(33, "Wstępna obróbka obrazka."); }));
 			var w3 = ExtensionMethods.FindContours(q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate(8).Erode());
 
-			var avg = ExtensionMethods.CalculateAvreage(w3.Item1);
+			var avg = ExtensionMethods.CalculateAvreage(w3.Item1, Prog);
 			var e4 = new VectorOfVectorOfPoint();
 			for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
 
-			//var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
+			var q5 = q1.Copy().MarkCountours(e4, new MCvScalar(255, 0, 0)).PutText("Puzzles find: " + e4.Size, new Point(200, 250), new MCvScalar(255, 255, 255));
 
 			var boundRect = new List<Rectangle>();
 
@@ -60,13 +63,13 @@ namespace Puzzle_Matcher
 			foreach (var r in boundRect)
 			{
 				x++;
-				var img = q1.Copy();
+				var img = q5.Copy();
 				img.ROI = r;
 				puzzels.Add(img.Copy());
-				CvInvoke.Rectangle(q1, r, new MCvScalar(250, 0, 250), 10);
+				CvInvoke.Rectangle(q5, r, new MCvScalar(250, 0, 250), 10);
 				CvInvoke.PutText
 				(
-					q1
+					q5
 					, x.ToString()
 					, new Point(r.X + r.Width / 2, r.Y + r.Height / 2)
 					, FontFace.HersheySimplex
@@ -96,7 +99,7 @@ namespace Puzzle_Matcher
 
 				for (int i = 0; i < contours.Size; i++)
 				{
-					if (CvInvoke.ContourArea(contours[i], false) > CvInvoke.ContourArea(Max[0], false))
+					if (CvInvoke.ContourArea(contours[i]) > CvInvoke.ContourArea(Max[0], false))
 					{
 						Max.Clear();
 						Max.Push(contours[i]);
@@ -119,28 +122,22 @@ namespace Puzzle_Matcher
 			var keypoints = new VectorOfKeyPoint(); //keyponty
 			var kdesc = new UMat();
 
-
 			Invoke(new Action(delegate { Progress(70, "Znajdowanie puktów charakterystycznych dla badanego obrazu."); }));
-
 
 			surf.DetectAndCompute(q1, null, keypoints, kdesc, false);
 
 			Features2DToolbox.DrawKeypoints(q1, keypoints, k1, new Bgr(0, 255, 0));
-			var orginal = new Image<Bgr, byte>(ExtensionMethods.OrginalImagePath); 
+			var orginal = new Image<Bgr, byte>(ExtensionMethods.OrginalImagePath);
 			var copyOrginal = orginal.Copy();
 			var orginalKeypoints = new VectorOfKeyPoint();
 			var odesc = new UMat();
 
 			Invoke(new Action(delegate { Progress(75, "Znajdowanie puktów charakterystycznych dla orginalnego obrazu."); }));
 			surf.DetectAndCompute(copyOrginal, null, orginalKeypoints, odesc, false);
-			
 
 			Features2DToolbox.DrawKeypoints(orginal, orginalKeypoints, copyOrginal, new Bgr(0, 255, 0));
 
-
-
 			Invoke(new Action(delegate { Progress(80, "Próba dopasowania puzzli."); }));
-
 
 			var matcher = new BFMatcher(DistanceType.L2);
 			var matches = new VectorOfVectorOfDMatch();
@@ -150,8 +147,6 @@ namespace Puzzle_Matcher
 			var result = new Mat();
 
 			Features2DToolbox.DrawMatches(copyOrginal, orginalKeypoints, k1, keypoints, matches, result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
-
-
 
 			foreach (var puzzel in puzzels)
 			{
@@ -177,7 +172,7 @@ namespace Puzzle_Matcher
 
 					foreach (var match in arrayOfMatches)
 					{
-						if(!( match.Distance > 0.5 )) continue;
+						if (!(match.Distance > 0.1)) continue; //IMPORTANT
 						X += orginalKeypoints[match.TrainIdx].Point.X;
 						Y += orginalKeypoints[match.TrainIdx].Point.Y;
 						filterArray[counter] = match;
@@ -201,7 +196,6 @@ namespace Puzzle_Matcher
 				Features2DToolbox.DrawMatches(copyOrginal, orginalKeypoints, puzzel, puzzelpoints, filteredpuzzelmatches, Result, new MCvScalar(255, 255, 255), new MCvScalar(255, 255, 255), null);
 			}
 
-
 			Invoke(new Action(delegate { Progress(90, "Układanie puzzli w właściwej kolejnoścu."); }));
 
 			//#Puzzles in x-ayx, y-ax
@@ -216,10 +210,10 @@ namespace Puzzle_Matcher
 				resultTab[i]++; //przetwarzając przetwarzałem od zera a puzzle są od 1 ..więc
 				finalword += resultTab[i];
 				finalword += " ";
-				if(i == X_ax-1) finalword += Environment.NewLine;
+				//if (i != 0 && (i % (X_ax)) == 0) finalword += Environment.NewLine;
 			}
 
-			var solution = new Bitmap(q1.Width/2, q1.Height/2);
+			var solution = new Bitmap(q1.Width / 2, q1.Height / 2);
 			solution.DrawSymbol(finalword, new SolidBrush(Color.Gray), new Font(FontFamily.GenericSerif, 40), new SolidBrush(Color.Black));
 
 			Invoke(new Action(delegate { Progress(99, "Zapisywanie postępów."); }));
@@ -228,7 +222,6 @@ namespace Puzzle_Matcher
 			ExtensionMethods.ImageOut.Add(solution);
 			ExtensionMethods.ImageOut.Add(fp.ToBitmap());
 
-			
 			Invoke(new Action(delegate { Progress(100, "DONE"); }));
 
 			Thread.Sleep(100);

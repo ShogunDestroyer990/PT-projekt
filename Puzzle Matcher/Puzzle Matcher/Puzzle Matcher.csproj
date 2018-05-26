@@ -112,6 +112,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="License-LGPL.txt" />
+    <None Include="Resources\ButtonLoadImage1.png" />
+    <None Include="Resources\ButtonPreviewImage.png" />
     <None Include="Resources\ButtonProcessImage.png" />
     <None Include="Resources\ButtonLoadImage.png" />
     <None Include="Resources\Icon.ico" />
