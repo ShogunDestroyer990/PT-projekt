@@ -171,7 +171,7 @@ namespace Puzzle_Matcher.WinForms
 			this.prog.Size = new System.Drawing.Size(68, 20);
 			this.prog.TabIndex = 7;
 			this.prog.Value = new decimal(new int[] {
-            85,
+            300,
             0,
             0,
             0});
@@ -181,9 +181,9 @@ namespace Puzzle_Matcher.WinForms
 			this.label3.AutoSize = true;
 			this.label3.Location = new System.Drawing.Point(395, 420);
 			this.label3.Name = "label3";
-			this.label3.Size = new System.Drawing.Size(174, 13);
+			this.label3.Size = new System.Drawing.Size(180, 13);
 			this.label3.TabIndex = 8;
-			this.label3.Text = "Wielkość konturów (domyślnie: 85):";
+			this.label3.Text = "Wielkość konturów (domyślnie: 300):";
 			// 
 			// Preview
 			// 

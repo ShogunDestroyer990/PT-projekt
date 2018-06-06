@@ -42,6 +42,8 @@ namespace Puzzle_Matcher.WinForms
 			new Thread(() => { Invoke(new Action(() => { ImageIn.Image = ExtensionMethods.ResizeImage(new Bitmap(ExtensionMethods.ImagePath), ImageIn.Width, ImageIn.Height); })); }).Start();
 
 			if (ExtensionMethods.ImagePath != null || ExtensionMethods.ImagePath != "") ProcessImage.Enabled = true;
+
+			PreviewElement = null;
 		}
 
 		private void PredictSizeOfPuzzles()
@@ -59,7 +61,29 @@ namespace Puzzle_Matcher.WinForms
 		/// <returns>Closing current window.</returns>
 		private void ProcessImage_Click(object sender, EventArgs e)
 		{
-			if (ExtensionMethods.ImagePath == null || ExtensionMethods.OrginalImagePath == null) return;
+			if (ExtensionMethods.ImagePath == null)
+			{
+				MessageBox.Show("Przepraszamy, aby przejść dalej musisz wczytać obraz.", "Błąd");
+				return;
+			}
+
+			if (PreviewElement == null)
+			{
+				MessageBox.Show("Przepraszamy, aby przejść dalej musisz wygenerować podgląd obrazka." + Environment.NewLine + Environment.NewLine + "W tem celu naciśni przycik \"Preview\".", "Błąd");
+				return;
+			}
+
+			if (PreviewElement.Item2 % 2 == 1)
+			{
+				MessageBox.Show("Przepraszamy, nie można ułożyć puzzli z nieparzystej ilości elementów." + Environment.NewLine + Environment.NewLine + "Spróbuj zmienić ustawienia wielkości konturu.", "Błąd");
+				return;
+			}
+
+			if (ExtensionMethods.OrginalImagePath == null)
+			{
+				MessageBox.Show("Przepraszamy, aby przejść dalej musisz wczytać orginalny obraz.", "Błąd");
+				return;
+			}
 
 			var t = new Thread(StartNewStaThread)
 			{
@@ -155,11 +179,21 @@ namespace Puzzle_Matcher.WinForms
 
 			var puzzelCounter = 0;
 
+			int[] avgX = new int[boundRect.Count];
+			int[] avgY = new int[boundRect.Count];
+
 			foreach (var r in boundRect)
 			{
+				avgX[puzzelCounter] = r.X;
+				avgY[puzzelCounter] = r.Y;
 				puzzelCounter++;
 				q1 = q1.Rectangle(r, new MCvScalar(250, 0, 250)).PutText(puzzelCounter.ToString(), new Point(r.X + r.Width / 2, r.Y + r.Height / 2), new MCvScalar(255, 0, 255), FontFace.HersheySimplex, 10, 20);
 			}
+
+			var assumedConfiguration = ExtensionMethods.AssumePuzzleConfiguration(avgX, avgY);
+
+			X_axis.Value = assumedConfiguration[1];
+			Y_axis.Value = assumedConfiguration[0];
 
 			return new Tuple<Bitmap, int>(q1.ToBitmap(), puzzelCounter);
 		}
