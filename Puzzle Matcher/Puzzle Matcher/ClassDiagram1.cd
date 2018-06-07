@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
+  <Class Name="Puzzle_Matcher.Helpers.ExtensionMethods">
+    <Position X="5.75" Y="7.25" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>BAIABAAAIAMAAACAMABAAYAAEAgkAECAAAAAAAAEAAA=</HashCode>
+      <FileName>Helpers\ExtensionMethods.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Puzzle_Matcher.Program">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Puzzle_Matcher.Properties.Resources">
+    <Position X="2.75" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAACAAQAAQAAAAAAAAABEAAAAQAAAAAAAAgAAAEAAYA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Puzzle_Matcher.Properties.Settings">
+    <Position X="0.5" Y="2" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAIAAAAAABAAAAAAAAAAAAAAA=</HashCode>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Puzzle_Matcher.WinForms.MainWindow">
+    <Position X="5.75" Y="0.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAACCiAABAAAACAAAACAAgwAIAECAchSCAAAAA=</HashCode>
+      <FileName>WinForms\Form1.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Puzzle_Matcher.WinForms.ResultWindow">
+    <Position X="12" Y="0.5" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAABgAAACAAAACAAgAABAAAAIAAAAAAAI=</HashCode>
+      <FileName>WinForms\Form2.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Puzzle_Matcher.WinForms.WorkInProgress">
+    <Position X="9" Y="0.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AIABABAQAGAgQAAAAACAAAACAAAAAAACIAAgCACAAAA=</HashCode>
+      <FileName>WinForms\WorkInProgress.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

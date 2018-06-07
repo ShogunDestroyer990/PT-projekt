@@ -89,6 +89,7 @@
     <EmbeddedResource Include="WinForms\WorkInProgress.resx">
       <DependentUpon>WorkInProgress.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
     <None Include="CodeMap.dgml" />
     <None Include="Configs\packages.config" />
     <None Include="Properties\Settings.settings">

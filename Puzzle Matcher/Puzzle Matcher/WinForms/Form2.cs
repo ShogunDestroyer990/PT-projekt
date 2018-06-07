@@ -43,68 +43,55 @@ namespace Puzzle_Matcher.WinForms
 
 		private void SaveToFolder_Click(object sender, EventArgs e)
 		{
-			Invoke(new Action(
-				() =>
-				{
-					using (var fbd = new FolderBrowserDialog()
+			Invoke
+			(
+				new Action
+				(
+					() =>
 					{
-						Description = @"Wybierz folder do zapisania obrazków"
-						,
-						SelectedPath = string.Empty
-						,
-						RootFolder = Environment.SpecialFolder.Desktop
-						,
-						ShowNewFolderButton = true
-					})
-					{
-						if (fbd.ShowDialog() != DialogResult.OK) return;
-
-						if (string.IsNullOrEmpty(fbd.SelectedPath) || string.IsNullOrWhiteSpace(fbd.SelectedPath)) return;
-
-						var ver = new bool[Images.Count];
-						for(var index = 0; index < ver.Length; index++)
+						using(var fbd = new FolderBrowserDialog
 						{
-							ver[index] = false;
-						}
-
-						for (var index = 0; index < Images.Count; index++)
+							Description = @"Wybierz folder do zapisania obrazków"
+							, SelectedPath = string.Empty
+							, RootFolder = Environment.SpecialFolder.Desktop
+							, ShowNewFolderButton = true
+						})
 						{
-							var image = Images[index];
-							var path = fbd.SelectedPath + "\\" + index + ".png";
-							image.Save(path, ImageFormat.Png);
-							if(File.Exists(path)) ver[index] = true;
+							if(fbd.ShowDialog() != DialogResult.OK) return;
+
+							if(string.IsNullOrEmpty(fbd.SelectedPath) || string.IsNullOrWhiteSpace(fbd.SelectedPath)) return;
+
+							var ver = new bool[Images.Count];
+							for(var index = 0; index < ver.Length; index++) ver[index] = false;
+
+							for(var index = 0; index < Images.Count; index++)
+							{
+								var image = Images[index];
+								var path = fbd.SelectedPath + "\\" + index + ".png";
+								image.Save(path, ImageFormat.Png);
+								if(File.Exists(path)) ver[index] = true;
+							}
+
+							if(ver.Any(b => false))
+								MessageBox.Show
+								(
+									@"Błąd zapisu plików"
+									, @"Niestety z nieznanych nam przyczyn nie udało się zapisać wszystkich obrazków poprawnie."
+									  + Environment.NewLine
+									  + @"Spróbuj zapisać jeszcze raz lub zrestartować program."
+									  + Environment.NewLine
+									  + Environment.NewLine
+									  + @"Jeżeli problem dalej występuje, napisz do nas na email:"
+									  + @"mail@example.com"
+								);
+							else
+								MessageBox.Show
+								(
+									@"Gratulacje"
+									, @"Udało się zapisać wszystkie pliki."
+								);
 						}
-
-						if(ver.Any(b => false))
-						{
-							MessageBox.Show
-							(
-								@"Błąd zapisu plików"
-								, @"Niestety z nieznanych nam przyczyn nie udało się zapisać wszystkich obrazków poprawnie."
-								  + Environment.NewLine
-								  + @"Spróbuj zapisać jeszcze raz lub zrestartować program."
-								  + Environment.NewLine
-								  + Environment.NewLine
-								  + @"Jeżeli problem dalej występuje, napisz do nas na email:"
-								  + @"mail@example.com"
-							);
-						}
-						else
-						{
-							MessageBox.Show
-							(
-								@"Gratulacje",
-								@"Udało się zapisać wszystkie pliki."
-							);
-						}
-
-					}
-
-				}));
-			
-
-
-			
+					}));
 		}
 	}
 }

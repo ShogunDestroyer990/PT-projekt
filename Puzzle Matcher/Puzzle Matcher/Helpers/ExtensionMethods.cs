@@ -1,14 +1,14 @@
-﻿using Emgu.CV;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.XFeatures2D;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 
 namespace Puzzle_Matcher.Helpers
 {
@@ -50,17 +50,26 @@ namespace Puzzle_Matcher.Helpers
 			return destImage;
 		}
 
-		public static Image<Gray, byte> GaussBlur(this Image<Gray, byte> inImage, Size ksize = new Size(), double sigmaX = 5, double sigmaY = 5)
+		public static Image<Gray, byte> GaussBlur
+			(this Image<Gray, byte> inImage, Size ksize = new Size(), double sigmaX = 5, double sigmaY = 5)
 		{
 			var outImage = inImage.Copy();
 			CvInvoke.GaussianBlur(inImage, outImage, ksize, sigmaX, sigmaY);
 			return outImage;
 		}
 
-		public static Image<Gray, byte> AdaptiveThreshold(this Image<Gray, byte> inImage, double maxVal = 250, AdaptiveThresholdType adaptiveThresholdType = AdaptiveThresholdType.MeanC, ThresholdType thresholdType = ThresholdType.BinaryInv, int blockSize = 39, double param1 = 4)
+		public static Image<Gray, byte> AdaptiveThreshold
+		(
+			this Image<Gray, byte> inImage
+			, double maxVal = 250
+			, AdaptiveThresholdType adaptiveThresholdType = AdaptiveThresholdType.MeanC
+			, ThresholdType thresholdType = ThresholdType.BinaryInv
+			, int blockSize = 39
+			, double param1 = 4)
 		{
 			var outImage = inImage.Copy();
-			CvInvoke.AdaptiveThreshold(GaussBlur(inImage), outImage, maxVal, adaptiveThresholdType, thresholdType, blockSize, param1);
+			CvInvoke.AdaptiveThreshold
+				(GaussBlur(inImage), outImage, maxVal, adaptiveThresholdType, thresholdType, blockSize, param1);
 			return outImage;
 		}
 
@@ -78,7 +87,11 @@ namespace Puzzle_Matcher.Helpers
 			return outImage;
 		}
 
-		public static Tuple<VectorOfVectorOfPoint, Mat> FindContours(Image<Gray, byte> inImage, RetrType retrType = RetrType.External, ChainApproxMethod chainApproxMethod = ChainApproxMethod.ChainApproxSimple)
+		public static Tuple<VectorOfVectorOfPoint, Mat> FindContours
+		(
+			Image<Gray, byte> inImage
+			, RetrType retrType = RetrType.External
+			, ChainApproxMethod chainApproxMethod = ChainApproxMethod.ChainApproxSimple)
 		{
 			var contours = new VectorOfVectorOfPoint();
 			var hierarchy = new Mat();
@@ -92,7 +105,7 @@ namespace Puzzle_Matcher.Helpers
 		{
 			double avg = 0;
 
-			for (var i = 0; i < contours.Size; i++) avg += CvInvoke.ContourArea(contours[i]);
+			for(var i = 0; i < contours.Size; i++) avg += CvInvoke.ContourArea(contours[i]);
 
 			avg /= contours.Size;
 			avg *= constant;
@@ -100,14 +113,29 @@ namespace Puzzle_Matcher.Helpers
 			return avg;
 		}
 
-		public static Image<Bgr, byte> PutText(this Image<Bgr, byte> inImage, string text, Point where, MCvScalar color, FontFace fontFace = FontFace.HersheySimplex, int fontScale = 10, int thickness = 2)
+		public static Image<Bgr, byte> PutText
+		(
+			this Image<Bgr, byte> inImage
+			, string text
+			, Point where
+			, MCvScalar color
+			, FontFace fontFace = FontFace.HersheySimplex
+			, int fontScale = 10
+			, int thickness = 2)
 		{
 			var outImage = inImage.Copy();
 			CvInvoke.PutText(outImage, text, where, fontFace, fontScale, color, thickness);
 			return outImage;
 		}
 
-		public static Image<Bgr, byte> Rectangle(this Image<Bgr, byte> inImage, Rectangle r, MCvScalar color, int thickness = 10, LineType lt = LineType.EightConnected, int shift = 0)
+		public static Image<Bgr, byte> Rectangle
+		(
+			this Image<Bgr, byte> inImage
+			, Rectangle r
+			, MCvScalar color
+			, int thickness = 10
+			, LineType lt = LineType.EightConnected
+			, int shift = 0)
 		{
 			var outImage = inImage.Copy();
 			CvInvoke.Rectangle(outImage, r, color, thickness, lt, shift);
@@ -116,13 +144,23 @@ namespace Puzzle_Matcher.Helpers
 
 		public static void DrawSymbol(this Image img, string symbol, Brush backgroundBrush, Font font, Brush textBrush)
 		{
-			using (var g = Graphics.FromImage(img))
+			using(var g = Graphics.FromImage(img))
 			{
 				g.FillRectangle(backgroundBrush, 0, 0, img.Width, img.Height);
 				g.SmoothingMode = SmoothingMode.AntiAlias;
 				g.InterpolationMode = InterpolationMode.HighQualityBicubic;
 				g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-				g.DrawString(symbol, font, textBrush, new Point(img.Width / 2, img.Height / 2), new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center });
+				g.DrawString
+				(
+					symbol
+					, font
+					, textBrush
+					, new Point(img.Width / 2, img.Height / 2)
+					, new StringFormat
+					{
+						Alignment = StringAlignment.Center
+						, LineAlignment = StringAlignment.Center
+					});
 				g.Flush();
 			}
 		}
@@ -138,24 +176,24 @@ namespace Puzzle_Matcher.Helpers
 			var puzzelXcounter = 0;
 			var avragepuzzelSize = 0;
 
-			foreach (var puzzel in puzzels)
+			foreach(var puzzel in puzzels)
 			{
 				avragepuzzelSize += puzzel.Width;
 				avragepuzzelSize += puzzel.Height;
 			}
 
-			avragepuzzelSize /= (puzzelCounter * 2);
+			avragepuzzelSize /= puzzelCounter * 2;
 
-			var finalPic = new Image<Bgr, byte>((avragepuzzelSize * puzzelX), (avragepuzzelSize * puzzelY));
+			var finalPic = new Image<Bgr, byte>(avragepuzzelSize * puzzelX, avragepuzzelSize * puzzelY);
 			var counterino = 0;
 
-			while (mumIsFinalPicDone == false)
+			while(mumIsFinalPicDone == false)
 			{
-				foreach (var puzzel in puzzels)
+				foreach(var puzzel in puzzels)
 				{
-					if (picId == resultTab[counterino])
+					if(picId == resultTab[counterino])
 					{
-						if (puzzelX == puzzelXcounter)
+						if(puzzelX == puzzelXcounter)
 						{
 							puzzelXcounter = 0;
 							finalsumX = 0;
@@ -174,7 +212,7 @@ namespace Puzzle_Matcher.Helpers
 					picId++;
 				}
 
-				if ((counterino + 1) == puzzelCounter)
+				if(counterino + 1 == puzzelCounter)
 				{
 					mumIsFinalPicDone = true;
 				}
@@ -190,32 +228,25 @@ namespace Puzzle_Matcher.Helpers
 
 		private static int[] PlacePuzzlesHelper(int e1, int e2, int[] ee1, int[] ee2)
 		{
-			var puzzelOrder = new int[(e1 * e2)];
+			var puzzelOrder = new int[e1 * e2];
 			var blocks = new List<int[]>();
 
-			for (var i = 0; i < (e1 * e2); i++)
+			for(var i = 0; i < e1 * e2; i++)
 			{
-				if (i % e1 != 0) continue;
+				if(i % e1 != 0) continue;
 				var block = new int[e1];
-				for (var j = 0; j < e1; j++)
-				{
-					block[j] = ee1[i + j];
-				}
+				for(var j = 0; j < e1; j++) block[j] = ee1[i + j];
 				blocks.Add(block);
 			}
 
 			var counter = 0;
-			foreach (var block in blocks)
+			foreach(var block in blocks)
+			foreach(var tX in ee2)
+			foreach(var b in block)
 			{
-				foreach (var tX in ee2)
-				{
-					foreach (var b in block)
-					{
-						if (b != tX) continue;
-						puzzelOrder[counter] = b;
-						counter++;
-					}
-				}
+				if(b != tX) continue;
+				puzzelOrder[counter] = b;
+				counter++;
 			}
 
 			return puzzelOrder;
@@ -223,17 +254,11 @@ namespace Puzzle_Matcher.Helpers
 
 		private static int[] SortedArray(double[] a)
 		{
-			var copyOfA = (double[])a.Clone();
+			var copyOfA = (double[]) a.Clone();
 			var tab = new int[a.Length];
 			Array.Sort(a);
 
-			for (var i = 0; i < a.Length; i++)
-			{
-				for (var j = 0; j < a.Length; j++)
-				{
-					if (a[i] == copyOfA[j]) tab[i] = j;
-				}
-			}
+			for(var i = 0; i < a.Length; i++) for(var j = 0; j < a.Length; j++) if(a[i] == copyOfA[j]) tab[i] = j;
 
 			return tab;
 		}
@@ -243,19 +268,19 @@ namespace Puzzle_Matcher.Helpers
 			var tabX = SortedArray(avgX);
 			var tabY = SortedArray(avgY);
 
-			if (hort >= vert) return PlacePuzzlesHelper(hort, vert, tabY, tabX);
+			if(hort >= vert) return PlacePuzzlesHelper(hort, vert, tabY, tabX);
 
 			var puzzelOrder = PlacePuzzlesHelper(vert, hort, tabX, tabY);
 
 			//zamiana na -> \|/ kolejność
-			var puzzelOrdercopy = (int[])puzzelOrder.Clone();
+			var puzzelOrdercopy = (int[]) puzzelOrder.Clone();
 			var counter = 0;
 			var bigcounter = 1;
-			for (var i = 0; i < puzzelOrder.Length; i++)
+			for(var i = 0; i < puzzelOrder.Length; i++)
 			{
 				puzzelOrder[i] = puzzelOrdercopy[counter];
 				counter += vert;
-				if (counter < puzzelOrder.Length) continue;
+				if(counter < puzzelOrder.Length) continue;
 				counter = bigcounter;
 				bigcounter++;
 			}
@@ -270,7 +295,8 @@ namespace Puzzle_Matcher.Helpers
 			return puzzelmatches;
 		}
 
-		public static Tuple<UMat, VectorOfKeyPoint> DetectAndCompute(SURF surf, Image<Bgr, byte> image, bool b, IInputArray inputArray = null)
+		public static Tuple<UMat, VectorOfKeyPoint> DetectAndCompute
+			(SURF surf, Image<Bgr, byte> image, bool b, IInputArray inputArray = null)
 		{
 			var keypoints = new VectorOfKeyPoint();
 			var desc = new UMat();
@@ -285,18 +311,18 @@ namespace Puzzle_Matcher.Helpers
 
 		public static int[] AssumePuzzleConfiguration(int[] avgX, int[] avgY)
 		{
-			int[] result = new int[2];
+			var result = new int[2];
 			//0-X
 			//1-Y
 
-			int resultX = 0;
-			int resultY = 0;
-			int avrageX = 0;
-			int avrageY = 0;
+			var resultX = 0;
+			var resultY = 0;
+			var avrageX = 0;
+			var avrageY = 0;
 
 			//liczymy średni punkt
 
-			for (int i = 0; i < avgX.Length; i++)
+			for(var i = 0; i < avgX.Length; i++)
 			{
 				avrageX += avgX[i];
 				avrageY += avgY[i];
@@ -306,26 +332,20 @@ namespace Puzzle_Matcher.Helpers
 			avrageY /= avgX.Length;
 
 			//ile jest puzzli poniżej średniej
-			for (int i = 0; i < avgX.Length; i++)
+			for(var i = 0; i < avgX.Length; i++)
 			{
-				if (avrageX > avgX[i])
-				{
-					resultX++;
-				}
+				if(avrageX > avgX[i]) resultX++;
 
-				if (avrageY > avgY[i])
-				{
-					resultY++;
-				}
+				if(avrageY > avgY[i]) resultY++;
 			}
 
 			//decyzja i dopasowanie
 
-			if (resultX > resultY)
+			if(resultX > resultY)
 			{
 				resultY = avgX.Length / resultY;
 			}
-			else if (resultX < resultY)
+			else if(resultX < resultY)
 			{
 				resultY = avgX.Length / resultX;
 			}
@@ -333,7 +353,7 @@ namespace Puzzle_Matcher.Helpers
 			{
 				// jeśli są takie same to znaczy że obraz jest 2x2 lub 3x3 itd
 				//oznacza to też że pierwiastek z całkowitej powinien oznaczać wielkość
-				resultX = (int)Math.Sqrt(avgX.Length);
+				resultX = (int) Math.Sqrt(avgX.Length);
 				resultY = resultX;
 			}
 

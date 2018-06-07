@@ -1,16 +1,16 @@
-﻿using Emgu.CV;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Threading;
+using System.Windows.Forms;
+using Emgu.CV;
 using Emgu.CV.CvEnum;
 using Emgu.CV.Features2D;
 using Emgu.CV.Structure;
 using Emgu.CV.Util;
 using Emgu.CV.XFeatures2D;
 using Puzzle_Matcher.Helpers;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Threading;
-using System.Windows.Forms;
 
 namespace Puzzle_Matcher.WinForms
 {
@@ -36,7 +36,7 @@ namespace Puzzle_Matcher.WinForms
 
 		private void Progress(int progresPercent, string description = null)
 		{
-			if (description != null) Description.Text = description;
+			if(description != null) Description.Text = description;
 			Worker.ReportProgress(progresPercent);
 		}
 
@@ -50,20 +50,21 @@ namespace Puzzle_Matcher.WinForms
 			var q1 = new Image<Bgr, byte>(ExtensionMethods.ImagePath);
 
 			Invoke(new Action(delegate { Progress(33, "Wstępna obróbka obrazka."); }));
-			var w3 = ExtensionMethods.FindContours(q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate(8).Erode());
+			var w3 = ExtensionMethods.FindContours
+				(q1.Copy().Convert<Gray, byte>().GaussBlur().AdaptiveThreshold().Dilate(8).Erode());
 
 			var avg = ExtensionMethods.CalculateAvreage(w3.Item1, Prog);
 			var e4 = new VectorOfVectorOfPoint();
-			for (var i = 0; i < w3.Item1.Size; i++) if (CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
+			for(var i = 0; i < w3.Item1.Size; i++) if(CvInvoke.ContourArea(w3.Item1[i]) > avg) e4.Push(w3.Item1[i]);
 			var boundRect = new List<Rectangle>();
-			for (var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
+			for(var i = 0; i < e4.Size; i++) boundRect.Add(CvInvoke.BoundingRectangle(e4[i]));
 
 			var puzzels = new List<Image<Bgr, byte>>();
 
 			Invoke(new Action(delegate { Progress(50, "Znajdowanie puzzli"); }));
 
 			var puzzleCount = 0;
-			foreach (var r in boundRect)
+			foreach(var r in boundRect)
 			{
 				puzzleCount++;
 				var img = q1.Copy();
@@ -72,7 +73,14 @@ namespace Puzzle_Matcher.WinForms
 				puzzels.Add(img.Copy());
 
 				q1 = q1.Rectangle(r, new MCvScalar(255, 0, 255));
-				q1 = q1.PutText(puzzleCount.ToString(), new Point(r.X + r.Width / 2, r.Y + r.Height / 2), new MCvScalar(255, 0, 255), FontFace.HersheySimplex, 10, 20);
+				q1 = q1.PutText
+				(
+					puzzleCount.ToString()
+					, new Point(r.X + r.Width / 2, r.Y + r.Height / 2)
+					, new MCvScalar(255, 0, 255)
+					, FontFace.HersheySimplex
+					, 10
+					, 20);
 			}
 
 			#endregion Indentyfikacja puzzli
@@ -102,7 +110,7 @@ namespace Puzzle_Matcher.WinForms
 			var matcher = new BFMatcher(DistanceType.L2);
 			matcher.Add(odesc);
 
-			foreach (var puzzel in puzzels)
+			foreach(var puzzel in puzzels)
 			{
 				var pdesc = surf.DetectAndCompute(puzzel);
 				var puzzelmatches = matcher.KnnMatch(pdesc, 3);
@@ -111,13 +119,13 @@ namespace Puzzle_Matcher.WinForms
 				double y = 0;
 				var count = 0;
 
-				for (var i = 0; i < puzzelmatches.Size; i++)
+				for(var i = 0; i < puzzelmatches.Size; i++)
 				{
 					var arrayOfMatches = puzzelmatches[i].ToArray();
 
-					foreach (var match in arrayOfMatches)
+					foreach(var match in arrayOfMatches)
 					{
-						if (!(match.Distance > MatchDistance)) continue;
+						if(!( match.Distance > MatchDistance )) continue;
 						x += orginalKeypoints[match.TrainIdx].Point.X;
 						y += orginalKeypoints[match.TrainIdx].Point.Y;
 						count++;
@@ -144,16 +152,17 @@ namespace Puzzle_Matcher.WinForms
 			var fp = ExtensionMethods.GenerateFinalpicture(XAx, YAx, resultTab, puzzels);
 
 			var finalword = "Puzzle należy ułożyć w kolejności:" + Environment.NewLine;
-			for (var i = 0; i < puzzelCounter; i++)
+			for(var i = 0; i < puzzelCounter; i++)
 			{
 				resultTab[i]++; //przetwarzając przetwarzałem od zera a puzzle są od 1 ..więc
 				finalword += resultTab[i];
 				finalword += " ";
-				if (i != 0 && ((i + 1) % (XAx)) == 0) finalword += Environment.NewLine;
+				if(i != 0 && ( i + 1 ) % XAx == 0) finalword += Environment.NewLine;
 			}
 
 			var solution = new Bitmap(q1.Width / 2, q1.Height / 2);
-			solution.DrawSymbol(finalword, new SolidBrush(Color.Gray), new Font(FontFamily.GenericSerif, 40), new SolidBrush(Color.Black));
+			solution.DrawSymbol
+				(finalword, new SolidBrush(Color.Gray), new Font(FontFamily.GenericSerif, 40), new SolidBrush(Color.Black));
 
 			#endregion Układanie puzzli
 
@@ -202,6 +211,5 @@ namespace Puzzle_Matcher.WinForms
 				// ignored
 			}
 		}
-	
 	}
 }
