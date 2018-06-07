@@ -21,5 +21,4 @@ C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Mat
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csproj.CoreCompileInputs.cache
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.exe
 C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.pdb
-C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Puzzle Matcher.exe.CodeAnalysisLog.xml
-C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\bin\Debug\Puzzle Matcher.exe.lastcodeanalysissucceeded
+C:\Users\Dawid\Desktop\Puzzle\Puzzle Matcher\Puzzle Matcher\obj\Debug\Puzzle Matcher.csprojResolveAssemblyReference.cache

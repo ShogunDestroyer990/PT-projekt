@@ -95,17 +95,17 @@ namespace Puzzle_Matcher.WinForms
 				return;
 			}
 
-			if(PreviewElement.Item2 % 2 == 1)
-			{
-				MessageBox.Show
-				(
-					"Przepraszamy, nie można ułożyć puzzli z nieparzystej ilości elementów."
-					+ Environment.NewLine
-					+ Environment.NewLine
-					+ "Spróbuj zmienić ustawienia wielkości konturu."
-					, "Błąd");
-				return;
-			}
+			//if(PreviewElement.Item2 % 2 == 1)
+			//{
+			//	MessageBox.Show
+			//	(
+			//		"Przepraszamy, nie można ułożyć puzzli z nieparzystej ilości elementów."
+			//		+ Environment.NewLine
+			//		+ Environment.NewLine
+			//		+ "Spróbuj zmienić ustawienia wielkości konturu."
+			//		, "Błąd");
+			//	return;
+			//}
 
 			if(ExtensionMethods.OrginalImagePath == null)
 			{
